@@ -3,6 +3,7 @@ const Ad = require('../models/ad');
 const fs = require('fs');
 const path = require('path');
 const { deleteUploads } = require('../helpers/uploads');
+const { json } = require('express/lib/response');
 
 
 // puntos positivos
@@ -62,11 +63,24 @@ const createAd = async( req = request, res = response ) => {
 const updateAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { id } = req.params;
-    const { user } = req;
     try {
-        
+        const adUpdate = await Ad.findByIdAndUpdate(id,{
+            title,
+            description
+        });
+        if ( !adUpdate ) {
+            return res.status(401).json({
+                msg: 'No se pudo actualizar el anuncio'
+            });
+        }
+        res.status(200).json({
+            msg: 'El anuncio se actualizo con exito'
+        });
     } catch (error) {
-        
+        console.log( 'error -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo actualizar el anuncio'
+        });
     }
 }
 
