@@ -8,7 +8,6 @@ saveImagesAd = async (req = request, res = response, next) => {
             for (let i = 0; i < req.files.length; i++) {
                 const content = req.files[i].buffer;
                 const fileNameParts = req.files[i].originalname.split('.');
-                console.log("fileNameParts -->",fileNameParts);
                 const name = fileNameParts[0];
                 const type = fileNameParts[1];
                 const newUpload = new Upload({

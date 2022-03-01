@@ -28,6 +28,8 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Rating'
     }
+},{
+    timestamps: true
 });
 
 module.exports = model('Ad', schemaAd);
