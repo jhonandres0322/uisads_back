@@ -1,24 +1,24 @@
 const { request, response } = require('express');
+const { organizeImage } = require('../helpers/uploads');
 const Upload = require('../models/upload');
 
-saveImagesAd = async (req = request, res = response, next) => {
+saveImages = async (req = request, res = response, next) => {
     try {
-        if( req.files.length > 0 ) {
+        if( req.files && req.files.length > 0 ) {
             let idsUpload = [];
             for (let i = 0; i < req.files.length; i++) {
-                const content = req.files[i].buffer;
-                const fileNameParts = req.files[i].originalname.split('.');
-                const name = fileNameParts[0];
-                const type = fileNameParts[1];
-                const newUpload = new Upload({
-                    content,
-                    name,
-                    type
-                });
+                const upload = organizeImage( req.files[i] );
+                const newUpload = new Upload(upload);
                 const uploadCreated = await newUpload.save();
                 idsUpload.push( uploadCreated._id );
                 req.images = idsUpload;
             }
+            next();
+        } else if ( req.file ) {
+            const upload = organizeImage( req.file );
+            const newUpload = new Upload(upload);
+            const uploadCreated = await newUpload.save();
+            req.image = uploadCreated._id;
             next();
         } else {
             return res.status(401).json({
@@ -35,5 +35,5 @@ saveImagesAd = async (req = request, res = response, next) => {
 
 
 module.exports = {
-    saveImagesAd
+    saveImages
 };

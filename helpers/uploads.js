@@ -13,8 +13,19 @@ deleteUploads = async ( listUploads = [] ) => {
     }
 }
 
+organizeImage = ( file ) => {
+    const content = file.buffer;
+    const fileNameParts = file.originalname.split('.');
+    const name = fileNameParts[0];
+    const type = fileNameParts[1];
+    return {
+        content,name,type
+    }
+}
+
 
 
 module.exports = {
-    deleteUploads
+    deleteUploads,
+    organizeImage
 }

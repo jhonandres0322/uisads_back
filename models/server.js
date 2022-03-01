@@ -3,6 +3,7 @@ const cors = require('cors');
 const MongoConnection = require('../database/db');
 const authRoutes = require('../routes/auth');
 const adRoutes = require('../routes/ad');
+const profileRoutes = require('../routes/profile');
 const morgan = require('morgan');
 const path = require('path');
 
@@ -44,6 +45,7 @@ class Server{
     routes(){
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.adPath, adRoutes);
+        this.app.use(this.profilePath, profileRoutes );
     }
 
     listen(){

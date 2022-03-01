@@ -3,15 +3,15 @@ const { Schema, model } = require('mongoose');
 const schemaProfile = new Schema({
     name: String,
     cellphone: String,
-    city: {
-        type: Schema.Types.ObjectId,
-        ref: 'City'
-    },
+    city: String,
     image: {
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     },
-    state: Boolean,
+    state: {
+        type: Boolean,
+        default: true
+    },
     description: String,
     user: {
         type: Schema.Types.ObjectId,
@@ -20,5 +20,10 @@ const schemaProfile = new Schema({
 },{
     timestamps: true
 });
+
+schemaProfile.methods.toJSON = function () {
+    const { __v, user, _id, ...profile } = this.toObject();
+    return profile;
+}
 
 module.exports = model('Profile', schemaProfile);

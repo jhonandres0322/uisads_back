@@ -12,12 +12,12 @@ const { validateJWT } = require('../middlewares/validate_jwt');
 const { validateAdExists } = require('../middlewares/validate_ad');
 
 const router = Router();
-const { saveImagesAd } = require('../middlewares/upload');
+const { saveImages } = require('../middlewares/upload');
 
 router.post('/',
-    multer({}).array('images',5),
-    saveImagesAd,
     validateJWT,
+    multer({}).array('images',5),
+    saveImages,
     check('title', 'El titulo del anuncio es obligatorio').not().isEmpty(),
     check('description','La descripción es obligatoria').not().isEmpty(),
     validateFields,
@@ -36,6 +36,7 @@ router.put('/:id',
 
 
 router.delete('/:id',
+    validateJWT,
     check('id', 'No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
     validateFields,
