@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const MongoConnection = require('../database/db');
 const authRoutes = require('../routes/auth');
+const adRoutes = require('../routes/ad');
 const morgan = require('morgan');
+const path = require('path');
 
 class Server{
 
@@ -32,6 +34,8 @@ class Server{
     middlewares(){
         this.app.use( cors()) ;
         this.app.use( express.json() );
+        this.app.use( express.urlencoded({ extended: true }) );
+        this.app.use('/public', express.static(path.join(__dirname, '/public')));
         if ( process.env.NODE_ENV == 'development '){
             this.app.use( morgan('dev') );
         }
@@ -39,6 +43,7 @@ class Server{
     
     routes(){
         this.app.use(this.authPath, authRoutes);
+        this.app.use(this.adPath, adRoutes);
     }
 
     listen(){

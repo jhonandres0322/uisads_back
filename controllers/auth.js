@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
+const { generarJWT } = require('../helpers/generate_jwt');
 
 const login = async (req = request,res = response ) => {
     const { email, password } = req.body;
@@ -9,7 +10,7 @@ const login = async (req = request,res = response ) => {
         const user = await User.findOne({ email });
         if ( !user ) {
             return res.status(400).json({
-                msg: 'Ya existe una cuenta con este correo electronico'
+                msg: `No existe una cuenta con el correo ${email}`
             });
         }
         // Verificar si el usuario se encuentra bloqueado
@@ -28,11 +29,11 @@ const login = async (req = request,res = response ) => {
         const validatePassword = bcryptjs.compareSync(password, user.password );
         if ( !validatePassword ) {
             user.retry++;
-            await User.findByIdAndUpdate( user.uid, {
+            await User.findByIdAndUpdate( user._id, {
                 retry: user.retry
             });
             if( user.retry == 5 ) {
-                await User.findByIdAndUpdate( user.uid, {
+                await User.findByIdAndUpdate( user._id, {
                     retry: 0,
                     blocked: true
                 });
@@ -41,9 +42,9 @@ const login = async (req = request,res = response ) => {
                 msg: 'Contraseña Incorrecta'
             });
         }
-        const token = await generarJWT( user.id );
+        const token = await generarJWT( user._id     );
         const lastEntry = new Date();
-        await User.findByIdAndUpdate( user.uid, {
+        await User.findByIdAndUpdate( user._id, {
             lastEntry,
             available: true
         });
@@ -55,37 +56,31 @@ const login = async (req = request,res = response ) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `SERVER ERROR: ${error}`
+            msg: `500 - SERVER ERROR`
         });
     }
 }
-// TODO: Realizar con el cargue de imagenes
+
 const registerUser = async (req = request,res = response ) => {
     const { email, password } = req.body;
     try {
-        const user = await User.find({email});
-        if ( user ) {
-            return res.status(400).json({
-                msg: 'Ya existe una cuenta con este correo electronico'
-            });
-        }
         const userCreated = new User();
         userCreated.email = email;
         const salt = bcryptjs.genSaltSync();
         userCreated.password = bcryptjs.hashSync( password, salt );
-        const userSaved = await user.save();
+        const userSaved = await userCreated.save();
         if( !userSaved ) {
-            return res.status(400).json({
+            return res.status(500).json({
                 msg: 'No se pudo guardar el usuario'
             });
         }
         return res.status(200).json({
             msg: 'Usuario Creado con Exito'
-        })
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: `SERVER ERROR: ${error}`
+            msg: `500 - SERVER ERROR`
         });
     }
 }

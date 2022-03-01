@@ -3,8 +3,11 @@ const { model, Schema} = require('mongoose');
 
 const schemaUser = new Schema({
     email: String,
-    passwod: String,
-    state: Boolean,
+    password: String,
+    state: {
+        type: Boolean,
+        default: true
+    },
     retry: {
         type: Number,
         default: 0
@@ -23,7 +26,7 @@ const schemaUser = new Schema({
     timestamps: true
 })
 
-schemaUser.methods.toJSON = () => {
+schemaUser.methods.toJSON = function () {
     const { __v, password, _id, ...user } = this.toObject();
     user.uid = _id;
     return user;

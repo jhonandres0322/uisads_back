@@ -12,12 +12,18 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     }],
-    post_date: Date,
+    post_date: {
+        type: Date,
+        default: new Date()
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category'
     },
-    state: Boolean,
+    state: {
+        type: Boolean,
+        default: true
+    },
     rating: {
         type: Schema.Types.ObjectId,
         ref: 'Rating'
