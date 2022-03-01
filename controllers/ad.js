@@ -2,6 +2,7 @@ const { request, response } = require('express');
 const Ad = require('../models/ad');
 const fs = require('fs');
 const path = require('path');
+const { deleteUploads } = require('../helpers/uploads');
 
 
 // puntos positivos
@@ -52,8 +53,8 @@ const createAd = async( req = request, res = response ) => {
         });
     } catch (error) {
         console.log( 'error -->', error);
-        return res.status(200).json({
-            msg: 'Se ha guardado el anuncio con exito'
+        return res.status(500).json({
+            msg: 'No se pudo guardar el anuncio'
         });
     }
 }
@@ -71,13 +72,24 @@ const updateAd = async( req = request, res = response ) => {
 
 const deleteAd = async( req = request, res = response ) => {
     try {
-        
+        const { id } = req.params;
+        const adsDelete = await Ad.findByIdAndDelete(id);
+        const uploads = adsDelete.images;
+        if ( deleteUploads( uploads ) ) {
+            return res.status(200).json({
+                msg: 'Anuncio eliminado con exito'
+            });
+        }
     } catch (error) {
-        
+        console.log( 'error -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo eliminar el anuncio'
+        });
     }
 }
 
 module.exports = {
     createAd,
-    updateAd
+    updateAd,
+    deleteAd
 }

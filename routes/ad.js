@@ -4,7 +4,7 @@ const { check } = require('express-validator');
 const multer =  require('multer');
 
 // Invocacion de los controladores
-const { createAd, updateAd } = require("../controllers/ad");
+const { createAd, updateAd, deleteAd } = require("../controllers/ad");
 
 // Invocacion de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
@@ -32,7 +32,15 @@ router.put('/:id',
     check('id').custom(validateAdExists),
     validateFields,
     updateAd
-)
+);
+
+
+router.delete('/:id',
+    check('id', 'No es un id valido').isMongoId(),
+    check('id').custom(validateAdExists),
+    validateFields,
+    deleteAd
+);
 
 
 module.exports = router;
