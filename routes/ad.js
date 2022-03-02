@@ -4,7 +4,7 @@ const { check } = require('express-validator');
 const multer =  require('multer');
 
 // Invocacion de los controladores
-const { createAd, updateAd, deleteAd } = require("../controllers/ad");
+const { createAd, updateAd, deleteAd, getAd } = require("../controllers/ad");
 
 // Invocacion de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
@@ -13,6 +13,15 @@ const { validateAdExists } = require('../middlewares/validate_ad');
 
 const router = Router();
 const { saveImages } = require('../middlewares/upload');
+const { isProfileExists } = require("../middlewares/validate_user");
+
+router.get('/:id',
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    check('id').custom(validateAdExists),
+    validateFields,
+    getAd
+);
 
 router.post('/',
     validateJWT,
@@ -26,9 +35,8 @@ router.post('/',
 
 router.put('/:id',
     validateJWT,
+    multer({}).array('images',5),
     check('id','No es un id valido').isMongoId(),
-    check('title','El tiulo del anuncio es obligatorio').not().isEmpty(),
-    check('description','La descripción es obligatoria').not().isEmpty(),
     check('id').custom(validateAdExists),
     validateFields,
     updateAd

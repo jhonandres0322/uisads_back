@@ -3,6 +3,8 @@ const Ad = require('../models/ad');
 const fs = require('fs');
 const path = require('path');
 const { deleteUploads } = require('../helpers/uploads');
+const { json } = require('express/lib/response');
+const { searchProfile } = require('../helpers/profile');
 
 
 // puntos positivos
@@ -21,10 +23,24 @@ const getAds = async( req = request, res = response ) => {
 
 
 const getAd = async( req = request, res = response ) => {
+    const { id } = req.params;
     try {
-        
+        const ad = await Ad.findById(id)
+                            .populate('images')
+                            .populate('publisher');
+        if ( !ad ) {
+            return res.status(400).json({
+                msg: 'No se encontro el anuncio'
+            })
+        }
+        res.status(200).json({
+            ad
+        });
     } catch (error) {
-        
+        console.log( 'error -->', error);
+        return res.status(500).json({
+            msg: 'No se puede visualizar el anuncio'
+        });
     }
 }
 
@@ -33,13 +49,13 @@ const getAd = async( req = request, res = response ) => {
 const createAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { user } = req;
-    const publisher = user._id;
     const { images } = req;
     try {
+        const { id } = await searchProfile( user._id );
         const adNew = new Ad({
             title,
             description,
-            publisher,
+            publisher: id,
             images
         });
         const adSaved = await adNew.save();
@@ -62,24 +78,45 @@ const createAd = async( req = request, res = response ) => {
 const updateAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { id } = req.params;
-    const { user } = req;
     try {
-        
+        const adUpdate = await Ad.findByIdAndUpdate(id,{
+            title,
+            description
+        });
+        if ( !adUpdate ) {
+            return res.status(401).json({
+                msg: 'No se pudo actualizar el anuncio'
+            });
+        }
+        res.status(200).json({
+            msg: 'El anuncio se actualizo con exito'
+        });
     } catch (error) {
-        
+        console.log( 'error -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo actualizar el anuncio'
+        });
     }
 }
 
 const deleteAd = async( req = request, res = response ) => {
     try {
         const { id } = req.params;
-        const adsDelete = await Ad.findByIdAndDelete(id);
         const uploads = adsDelete.images;
-        if ( deleteUploads( uploads ) ) {
-            return res.status(200).json({
-                msg: 'Anuncio eliminado con exito'
+        if ( !deleteUploads( uploads ) ) {
+            return res.status(400).json({
+                msg: 'No se pudo eliminar el anuncio'
             });
         }
+        const adsDelete = await Ad.findByIdAndDelete(id);
+        if( !adsDelete ) {
+            return res.status(400).json({
+                msg: 'No se pudo eliminar el anuncio'
+            });
+        }
+        res.status(200).json({
+            msg: 'Anuncio eliminado con exito'
+        });
     } catch (error) {
         console.log( 'error -->', error);
         return res.status(500).json({
@@ -91,5 +128,6 @@ const deleteAd = async( req = request, res = response ) => {
 module.exports = {
     createAd,
     updateAd,
-    deleteAd
+    deleteAd,
+    getAd
 }
