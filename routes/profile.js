@@ -2,17 +2,23 @@
 const { Router } = require("express");
 const { check } = require('express-validator');
 const multer =  require('multer');
-const { createProfile } = require("../controllers/profile");
+const { createProfile, getProfile } = require("../controllers/profile");
 const { saveImages } = require("../middlewares/upload");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
-const { isUserExists, isProfileExists } = require("../middlewares/validate_user");
-
-
+const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
 
 
 // Instancia del router
 const router = Router();
+
+router.get('/:id',
+    validateJWT,
+    check('id','No es un id valido').isMongoId(),
+    validateFields,
+    getProfile
+);
+
 
 // Rutas
 router.post('/',

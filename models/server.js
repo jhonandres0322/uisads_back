@@ -37,9 +37,7 @@ class Server{
         this.app.use( express.json() );
         this.app.use( express.urlencoded({ extended: true }) );
         this.app.use('/public', express.static(path.join(__dirname, '/public')));
-        if ( process.env.NODE_ENV == 'development '){
-            this.app.use( morgan('dev') );
-        }
+        this.app.use( morgan('dev') );
     }
     
     routes(){

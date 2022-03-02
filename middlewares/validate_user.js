@@ -32,8 +32,20 @@ const isProfileExists = async ( req = request, res = response, next ) => {
     next();
 }
 
+const validateExistsProfile = async ( req = request, res = response, next) => {
+    const profile = await Profile.findById( id );
+    if ( !profile ) {
+        return res.status(400).json({
+            msg: 'No existe el perfil de usuario'
+        });
+    }
+    next();
+}
+
+
 module.exports = {
     isEmailExists,
     isUserExists,
-    isProfileExists
+    isProfileExists,
+    validateExistsProfile
 }
