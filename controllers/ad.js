@@ -1,10 +1,8 @@
 const { request, response } = require('express');
 const Ad = require('../models/ad');
-const fs = require('fs');
-const path = require('path');
 const { deleteUploads } = require('../helpers/uploads');
-const { json } = require('express/lib/response');
 const { searchProfile } = require('../helpers/profile');
+const { searchRatingByAd, createNewRating } = require('../helpers/ad');
 
 
 // puntos positivos
@@ -20,14 +18,21 @@ const getAds = async( req = request, res = response ) => {
     }
 }
 
-
+const getAdsByPublisher = async ( req = request, res = response) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 
 const getAd = async( req = request, res = response ) => {
     const { id } = req.params;
     try {
         const ad = await Ad.findById(id)
                             .populate('images')
-                            .populate('publisher');
+                            .populate('publisher')
+                            .populate('rating');
         if ( !ad ) {
             return res.status(400).json({
                 msg: 'No se encontro el anuncio'
@@ -44,8 +49,6 @@ const getAd = async( req = request, res = response ) => {
     }
 }
 
-// TODO: El publisher debe venir del usuario logueado
-// TODO: Las imagenes debe guardarse en el upload
 const createAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { user } = req;
@@ -125,9 +128,47 @@ const deleteAd = async( req = request, res = response ) => {
     }
 }
 
+const manageRating = async ( req = request, res = response ) => {
+    try {
+        const { id } = req.params;
+        const { choice } = req.body;
+        const ad = await Ad.findById( id );
+        if ( !ad ) {
+            return res.status(400).json({
+                msg: 'No se encontro el anuncio'
+            });
+        }
+        if( ad.rating ) {
+            const rating = searchRatingByAd( ad.rating );
+            if ( !rating ) {
+                const createRating = createNewRating(ad.id, choice);
+                if ( !createRating ) {
+                    return res.status(400).json({
+                        msg: 'Problemas para agregar la calificación'
+                    });
+                } else {
+                    return res.status(200).json({
+                        msg: 'Su calificación ha sido registrada con exito'
+                    });
+                }
+            }
+        }
+        
+    } catch (error) {
+        console.log( 'error -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo eliminar el anuncio'
+        });
+    }
+}
+
+
 module.exports = {
     createAd,
     updateAd,
     deleteAd,
-    getAd
+    getAd,
+    getAdsByPublisher,
+    getAds,
+    manageRating
 }

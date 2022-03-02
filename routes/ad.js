@@ -4,7 +4,7 @@ const { check } = require('express-validator');
 const multer =  require('multer');
 
 // Invocacion de los controladores
-const { createAd, updateAd, deleteAd, getAd } = require("../controllers/ad");
+const { createAd, updateAd, deleteAd, getAd, manageRating } = require("../controllers/ad");
 
 // Invocacion de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
@@ -13,7 +13,6 @@ const { validateAdExists } = require('../middlewares/validate_ad');
 
 const router = Router();
 const { saveImages } = require('../middlewares/upload');
-const { isProfileExists } = require("../middlewares/validate_user");
 
 router.get('/:id',
     validateJWT,
@@ -49,6 +48,14 @@ router.delete('/:id',
     check('id').custom(validateAdExists),
     validateFields,
     deleteAd
+);
+
+router.post('/rating/:id', 
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    check('id').custom(validateAdExists),
+    validateFields,
+    manageRating
 );
 
 

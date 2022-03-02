@@ -55,8 +55,17 @@ const createProfile = async (req = request, res = response ) => {
     }
 }
 
+const updateProfile = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
 
 module.exports = {
     createProfile,
-    getProfile
+    getProfile,
+    updateProfile
 }
