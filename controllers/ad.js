@@ -2,12 +2,10 @@ const { request, response } = require('express');
 const Ad = require('../models/ad');
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
-const { searchRatingByAd, createNewRating } = require('../helpers/ad');
+const Rating = require('../models/rating');
 
 
 // puntos positivos
-// fecha de publicación
-
 // fecha de publicación
 
 const getAds = async( req = request, res = response ) => {
@@ -132,32 +130,75 @@ const manageRating = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
         const { choice } = req.body;
+        if ( choice != 'like' || choice != 'dislike' ) {
+            return res.status(400).json({
+                msg: 'Escoja una opción valida'
+            });
+        }
         const ad = await Ad.findById( id );
         if ( !ad ) {
             return res.status(400).json({
                 msg: 'No se encontro el anuncio'
             });
-        }
-        if( ad.rating ) {
-            const rating = searchRatingByAd( ad.rating );
-            if ( !rating ) {
-                const createRating = createNewRating(ad.id, choice);
-                if ( !createRating ) {
+        } else {
+            if( ad.rating ) {
+                const rating = await Rating.findById( ad.rating );
+                if ( !rating ) {
                     return res.status(400).json({
-                        msg: 'Problemas para agregar la calificación'
-                    });
-                } else {
-                    return res.status(200).json({
-                        msg: 'Su calificación ha sido registrada con exito'
+                        msg: 'No se pudo registrar su votación'
                     });
                 }
+                choice == 'like' 
+                ? rating.positive_points++ 
+                : rating.negative_points++
+                rating.score = rating.positive_points - rating.negative_points;
+                const ratingUpdated = await Rating.findByIdAndUpdate( rating._id, {
+                    score: rating.score,
+                    positive_points: rating.positive_points,
+                    negative_points: rating.negative_points
+                });
+                if ( !ratingUpdated ) {
+                    return res.status(400).json({
+                        msg: 'No se pudo registrar su votación'
+                    });
+                } 
+                return res.status(200).json({
+                    msg: 'Voto registrado con exito'
+                });
+            } else {
+                let positive_points = 0;
+                let negative_points = 0;
+                const newRating = new Rating();
+                choice == 'like'
+                ? positive_points++
+                : negative_points++
+                let score = positive_points - negative_points;
+                newRating.positive_points = positive_points;
+                newRating.negative_points = negative_points;
+                newRating.score = score;
+                const savedRating = await newRating.save();
+                if ( !savedRating ) {
+                    return res.status(400).json({
+                        msg: 'No se pudo registrar su votación'
+                    });
+                }
+                const updatedAd = await Ad.findByIdAndUpdate( ad._id, {
+                    rating: savedRating._id
+                });
+                if( !updatedAd ) {
+                    return res.status(400).json({
+                        msg: 'No se pudo registrar su votación'
+                    });
+                }
+                return res.status(200).json({
+                    msg: 'Voto registrado con exito'
+                });
             }
         }
-        
     } catch (error) {
         console.log( 'error -->', error);
         return res.status(500).json({
-            msg: 'No se pudo eliminar el anuncio'
+            msg: 'No se pudo registrar su votación'
         });
     }
 }
