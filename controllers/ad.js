@@ -130,7 +130,9 @@ const manageRating = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
         const { choice } = req.body;
-        if ( choice != 'like' || choice != 'dislike' ) {
+        const options = ['like', 'dislike'];
+        const isOptionValidate = options.find( opt => opt == choice )
+        if ( !isOptionValidate ) {
             return res.status(400).json({
                 msg: 'Escoja una opción valida'
             });

@@ -1,7 +1,6 @@
 // Invocación de las dependencias
 const { Router } = require("express");
 const { check } = require('express-validator');
-const multer =  require('multer');
 
 // Invocacion de los controladores
 const { createAd, updateAd, deleteAd, getAd, manageRating } = require("../controllers/ad");
@@ -12,7 +11,7 @@ const { validateJWT } = require('../middlewares/validate_jwt');
 const { validateAdExists } = require('../middlewares/validate_ad');
 
 const router = Router();
-const { saveImages } = require('../middlewares/upload');
+const { saveImages, upload } = require('../middlewares/upload');
 
 router.get('/:id',
     validateJWT,
@@ -24,8 +23,8 @@ router.get('/:id',
 
 router.post('/',
     validateJWT,
-    multer({}).array('images',5),
-    saveImages,
+    upload.array('images',5),
+    // saveImages,
     check('title', 'El titulo del anuncio es obligatorio').not().isEmpty(),
     check('description','La descripción es obligatoria').not().isEmpty(),
     validateFields,
@@ -34,7 +33,7 @@ router.post('/',
 
 router.put('/:id',
     validateJWT,
-    multer({}).array('images',5),
+    upload.array('images',5),
     check('id','No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
     validateFields,

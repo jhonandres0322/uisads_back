@@ -23,6 +23,7 @@ const schemaProfile = new Schema({
 
 schemaProfile.methods.toJSON = function () {
     const { __v, user, _id, ...profile } = this.toObject();
+    profile.uid = _id;
     return profile;
 }
 

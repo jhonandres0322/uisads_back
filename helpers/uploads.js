@@ -1,7 +1,8 @@
 const Upload = require('../models/upload');
+const fs = require('fs');
+const lz = require('lz-string');
 
-
-deleteUploads = async ( listUploads = [] ) => {
+const deleteUploads = async ( listUploads = [] ) => {
     try {
         for (const upload of listUploads) {
             await Upload.findByIdAndDelete( upload );
@@ -13,8 +14,8 @@ deleteUploads = async ( listUploads = [] ) => {
     }
 }
 
-organizeImage = ( file ) => {
-    const content = file.buffer;
+const organizeImage = ( file ) => {
+    const content = convertFileToBase64( file.path );
     const fileNameParts = file.originalname.split('.');
     const name = fileNameParts[0];
     const type = fileNameParts[1];
@@ -23,9 +24,17 @@ organizeImage = ( file ) => {
     }
 }
 
+const convertFileToBase64 = ( path ) => {
+    const buffer = fs.readFileSync( path );
+    let bufferStr = JSON.stringify( buffer );
+    console.log('type -->', typeof bufferStr);
+    return bufferStr ;
+}
+
 
 
 module.exports = {
     deleteUploads,
-    organizeImage
+    organizeImage,
+    convertFileToBase64
 }

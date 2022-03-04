@@ -3,7 +3,7 @@ const { Router } = require("express");
 const { check } = require('express-validator');
 const multer =  require('multer');
 const { createProfile, getProfile } = require("../controllers/profile");
-const { saveImages } = require("../middlewares/upload");
+const { saveImages, upload } = require("../middlewares/upload");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
 const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
@@ -23,8 +23,8 @@ router.get('/:id',
 // Rutas
 router.post('/',
     validateJWT,
-    multer({}).single('image'),
-    saveImages,
+    upload.single('image'),
+    // saveImages,
     isProfileExists,
     check('name','El nombre es obligatorio').not().isEmpty(),
     check('cellphone', 'El telefono es obligatorio').not().isEmpty(),
