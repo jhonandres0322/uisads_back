@@ -1,5 +1,6 @@
 const Ad = require('../models/ad');
 const Profile = require('../models/profile');
+const Category = require('../models/category');
 
 const validateAdExists = async (id) => {
     const ad = await Ad.findById(id);
@@ -24,7 +25,15 @@ const validateOwnerAd = async ( req = request, res = response, next ) => {
     next();
 }
 
+const validateCategoryExists = async ( id ) => {
+    const category = await Category.findById( id );
+    if ( !category ) {
+        throw new Error('No existe la categoria');
+    }
+}
+
 module.exports = {
     validateAdExists,
-    validateOwnerAd
+    validateOwnerAd,
+    validateCategoryExists
 }

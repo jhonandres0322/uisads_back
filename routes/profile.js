@@ -1,13 +1,15 @@
 // Invocación de las dependencias
 const { Router } = require("express");
 const { check, body } = require('express-validator');
-const multer =  require('multer');
+
+// Invocación de los controladores
 const { createProfile, getProfile, updateProfile } = require("../controllers/profile");
+
+// Invocación de los middlewares
 const { saveImages, upload } = require("../middlewares/upload");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
 const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
-
 
 // Instancia del router
 const router = Router();
@@ -44,8 +46,5 @@ router.put('/:id',
     validateFields,
     updateProfile
 );
-
-
-
 
 module.exports = router;

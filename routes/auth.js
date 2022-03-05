@@ -12,7 +12,6 @@ const {
 const { validateFields } = require("../middlewares/validate_fields");
 const { isEmailExists } = require("../middlewares/validate_user");
 
-
 const router = Router();
 
 router.post('/login', 

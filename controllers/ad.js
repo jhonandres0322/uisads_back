@@ -3,6 +3,7 @@ const Ad = require('../models/ad');
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
 const Rating = require('../models/rating');
+const { makePagination } = require('../helpers/ads');
 
 
 // puntos positivos
@@ -10,36 +11,79 @@ const Rating = require('../models/rating');
 
 const getAds = async( req = request, res = response ) => {
     try {
-        
+        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const page = {
+            number: pageValue,
+            size: pageSize
+        };
+        const sort = {
+            value : sortValue,
+            direction: sortDirection
+        };
+        const ads = await makePagination(page, sort, {} , filter );
+        const totalRow = ads.length;
+        res.status(200).json({
+            totalRow,
+            ads 
+        });
     } catch (error) {
-        
+        console.log(` ERROR CONTROLLER GET ADS --> ${error} `)
+        return res.status(500).json({
+            msg: 'No se pueden visualizar los anuncios'
+        })
+    }
+}
+
+const getAdsByCategory = async ( req = request, res = response ) => {
+    try {
+        const { id } = req.params;
+        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const page = {
+            number: pageValue,
+            size: pageSize
+        };
+        const sort = {
+            value : sortValue,
+            direction: sortDirection
+        };
+        const condition = {
+            key : 'publisher',
+            value : id
+        };
+        const ads = await makePagination(page, sort, condition, filter );
+        const totalRow = ads.length;
+        res.status(200).json({
+            totalRow,
+            ads 
+        });
+    } catch (error) {
+        console.log(` ERROR CONTROLLER GET ADS CATEGORY --> ${error} `)
+        return res.status(500).json({
+            msg: 'No se pueden visualizar los anuncios'
+        })
     }
 }
 
 const getAdsByPublisher = async ( req = request, res = response) => {
     try {
         const { id } = req.params;
-        const { page, sort, sortDirection, filter, pageSize } = req.body;
-        let filterValue = '';
-        let filteProperty = '';
-        if ( filter ) {
-            filterValue = filter.value;
-            filteProperty = filter.key;
-        }
-        console.log('page -->', page);
-        const ads = await Ad.find
-            ({
-                publisher: id , 
-                [filteProperty] : new RegExp(filterValue,'i') 
-            })
-            .populate('publisher')
-            .populate('rating')
-            .sort({ [sort]: sortDirection })
-            .skip(( page - 1 ) * pageSize )
-            .limit(pageSize);
-        const total = ads.length;
+        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const page = {
+            number: pageValue,
+            size: pageSize
+        };
+        const sort = {
+            value : sortValue,
+            direction: sortDirection
+        };
+        const condition = {
+            key : 'publisher',
+            value : id
+        };
+        const ads = await makePagination(page, sort, condition, filter );
+        const totalRow = ads.length;
         res.status(200).json({
-            total,
+            totalRow,
             ads 
         });
     } catch (error) {
@@ -135,7 +179,7 @@ const deleteAd = async( req = request, res = response ) => {
                 msg: 'No se pudo eliminar el anuncio'
             });
         }
-        const adsDelete = await Ad.findByIdAndDelete(id);
+        const adsDelete = await Ad.findByIdAndUpdate(id, { state: false });
         if( !adsDelete ) {
             return res.status(400).json({
                 msg: 'No se pudo eliminar el anuncio'
@@ -239,5 +283,6 @@ module.exports = {
     getAd,
     getAdsByPublisher,
     getAds,
-    manageRating
+    manageRating,
+    getAdsByCategory
 }

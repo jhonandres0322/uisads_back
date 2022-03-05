@@ -3,16 +3,34 @@ const { Router } = require("express");
 const { check } = require('express-validator');
 
 // Invocacion de los controladores
-const { createAd, updateAd, deleteAd, getAd, manageRating, getAdsByPublisher } = require("../controllers/ad");
+const { 
+    createAd,
+    updateAd,
+    deleteAd,
+    getAd,
+    manageRating,
+    getAdsByPublisher, 
+    getAds
+} = require("../controllers/ad");
 
 // Invocacion de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require('../middlewares/validate_jwt');
-const { validateAdExists, validateOwnerAd } = require('../middlewares/validate_ad');
-
-const router = Router();
+const { 
+    validateAdExists, 
+    validateOwnerAd, 
+    validateCategoryExists 
+} = require('../middlewares/validate_ad');
 const { saveImages, upload } = require('../middlewares/upload');
 const { validateExistsProfile } = require("../middlewares/validate_user");
+
+const router = Router();
+
+router.get('/',
+    validateJWT,
+    validateFields,
+    getAds
+);
 
 router.get('/:id',
     validateJWT,
@@ -24,11 +42,19 @@ router.get('/:id',
 
 router.get('/publisher/:id',
     validateJWT,
-    check('id','No es un perfil valid6222a0499dd210a2fa460de2').isMongoId(),
+    check('id','No es un perfil valido').isMongoId(),
     check('id').custom(validateExistsProfile),
     validateFields,
     getAdsByPublisher
 );
+
+router.get('/category/:id',
+    validateJWT,
+    check('id','No es una categoria valida').isMongoId(),
+    check('id').custom(validateCategoryExists),
+    validateFields,
+    getAdsByPublisher
+)
 
 router.post('/',
     validateJWT,
