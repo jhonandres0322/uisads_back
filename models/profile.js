@@ -16,6 +16,10 @@ const schemaProfile = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    rating: {
+        type: Schema.Types.ObjectId,
+        ref: 'Rating'
     }
 },{
     timestamps: true

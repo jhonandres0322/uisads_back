@@ -3,7 +3,12 @@ const { Router } = require("express");
 const { check, body } = require('express-validator');
 
 // Invocación de los controladores
-const { createProfile, getProfile, updateProfile } = require("../controllers/profile");
+const { 
+    createProfile, 
+    getProfile, 
+    updateProfile, 
+    calculateRatingProfile 
+} = require("../controllers/profile");
 
 // Invocación de los middlewares
 const { saveImages, upload } = require("../middlewares/upload");
@@ -45,6 +50,11 @@ router.put('/:id',
         .isMobilePhone('es-CO'),
     validateFields,
     updateProfile
+);
+
+router.post('/calculate',
+    validateJWT,
+    calculateRatingProfile
 );
 
 module.exports = router;
