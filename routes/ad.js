@@ -3,15 +3,16 @@ const { Router } = require("express");
 const { check } = require('express-validator');
 
 // Invocacion de los controladores
-const { createAd, updateAd, deleteAd, getAd, manageRating } = require("../controllers/ad");
+const { createAd, updateAd, deleteAd, getAd, manageRating, getAdsByPublisher } = require("../controllers/ad");
 
 // Invocacion de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require('../middlewares/validate_jwt');
-const { validateAdExists } = require('../middlewares/validate_ad');
+const { validateAdExists, validateOwnerAd } = require('../middlewares/validate_ad');
 
 const router = Router();
 const { saveImages, upload } = require('../middlewares/upload');
+const { validateExistsProfile } = require("../middlewares/validate_user");
 
 router.get('/:id',
     validateJWT,
@@ -19,6 +20,14 @@ router.get('/:id',
     check('id').custom(validateAdExists),
     validateFields,
     getAd
+);
+
+router.get('/publisher/:id',
+    validateJWT,
+    check('id','No es un perfil valid6222a0499dd210a2fa460de2').isMongoId(),
+    check('id').custom(validateExistsProfile),
+    validateFields,
+    getAdsByPublisher
 );
 
 router.post('/',
@@ -33,6 +42,7 @@ router.post('/',
 
 router.put('/:id',
     validateJWT,
+    validateOwnerAd,
     upload.array('images',5),
     check('id','No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
@@ -43,6 +53,7 @@ router.put('/:id',
 
 router.delete('/:id',
     validateJWT,
+    validateOwnerAd,
     check('id', 'No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
     validateFields,

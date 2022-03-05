@@ -20,26 +20,21 @@ const isUserExists = async ( req = request, res = response, next ) => {
     next();
 }
 
-const isProfileExists = async ( req = request, res = response, next ) => {
-    const profileExist = await Profile.findOne({
-        user: req.user._id
-    });
+const isProfileExists = async ( req = request, res = response, next ) => { 
+    const profileExist = await Profile.findOne({ user: req.user.id });
     if( profileExist ) {
-        return res.status(401).json({
-            msg: 'Ya posee un perfil'
+        return res.status(400).json({
+            msg: 'Ya posee un perfil de usuario'
         });
     }
     next();
 }
 
-const validateExistsProfile = async ( req = request, res = response, next) => {
+const validateExistsProfile = async ( id ) => {
     const profile = await Profile.findById( id );
     if ( !profile ) {
-        return res.status(400).json({
-            msg: 'No existe el perfil de usuario'
-        });
+        throw new Error('El perfil de usuario no existe');
     }
-    next();
 }
 
 
