@@ -1,8 +1,8 @@
 // Invocación de las dependencias
 const { Router } = require("express");
-const { check } = require('express-validator');
+const { check, body } = require('express-validator');
 const multer =  require('multer');
-const { createProfile, getProfile } = require("../controllers/profile");
+const { createProfile, getProfile, updateProfile } = require("../controllers/profile");
 const { saveImages, upload } = require("../middlewares/upload");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
@@ -19,8 +19,6 @@ router.get('/:id',
     getProfile
 );
 
-
-// Rutas
 router.post('/',
     validateJWT,
     upload.single('image'),
@@ -32,6 +30,19 @@ router.post('/',
     check('city','La ciudad es obligatoria').not().isEmpty(),
     validateFields,
     createProfile
+);
+
+router.put('/:id',
+    validateJWT,
+    check('id','No es un id valido').isMongoId(),
+    upload.single('image'),
+    // saveImages,
+    check('id').custom(validateExistsProfile),
+    check('cellphone','Debe ser un número de telefono valido')
+        .if( body('cellphone').exists() )
+        .isMobilePhone('es-CO'),
+    validateFields,
+    updateProfile
 );
 
 

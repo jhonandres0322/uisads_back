@@ -25,7 +25,6 @@ const getProfile = async ( req = request, res = response ) => {
 
 
 const createProfile = async (req = request, res = response ) => {
-
     try {
         const { name, cellphone, city } = req.body;
         const { user } = req;
@@ -57,9 +56,26 @@ const createProfile = async (req = request, res = response ) => {
 
 const updateProfile = async ( req = request, res = response ) => {
     try {
-        
+        const { id } = req.params;
+        const { name, cellphone, city } = req.body;
+        const { user } = req;
+        const { image } = req;
+        const updatedProfile = await Profile.findByIdAndUpdate( id, {
+            name, cellphone, city, user : user._id, image 
+        });
+        if ( !updatedProfile ) {
+            return res.status(400).json({
+                msg: 'No se pudo crear el perfil'
+            });
+        }
+        res.status(200).json({
+            msg: 'Perfil actualizado con exito'
+        });
     } catch (error) {
-        
+        console.log('Controller Update Profile Error -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo actualizar el perfil'
+        })
     }
 }
 
