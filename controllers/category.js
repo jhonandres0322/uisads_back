@@ -1,6 +1,32 @@
 const { request, response } = require('express');
 const Category = require('../models/category');
 
+
+const getCategories = async ( req = request, res = response ) => {
+    try {
+        const categories = await Category.find();
+        if ( !categories ) {
+            return res.status(400).json({
+                msg: 'No se pueden listar las categorias'
+            })
+        }
+        if ( !categories.length ) {
+            return res.status(200).json({
+                msg: 'No existen categorias'
+            });
+        }
+        res.status(200).json({
+            totalRows: categories.length,
+            categories
+        })
+    } catch (error) {
+        console.log(' ERROR CONTROLLER GET CATEGORIES -->', error);
+        return res.status(500).json({
+            msg: 'No se pueden listar las categorias'
+        })
+    }
+}
+
 const createCategory = async ( req = request, res = response ) => {
     try {
         const { name } = req.body;
@@ -35,5 +61,6 @@ const createCategory = async ( req = request, res = response ) => {
 }
 
 module.exports = {
-    createCategory
+    createCategory,
+    getCategories
 }
