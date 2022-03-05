@@ -10,7 +10,8 @@ const {
     getAd,
     manageRating,
     getAdsByPublisher, 
-    getAds
+    getAds,
+    searchAds
 } = require("../controllers/ad");
 
 // Invocacion de los middlewares
@@ -92,6 +93,11 @@ router.post('/rating/:id',
     check('id').custom(validateAdExists),
     validateFields,
     manageRating
+);
+
+router.get('/search/:query',
+    validateJWT,
+    searchAds
 );
 
 

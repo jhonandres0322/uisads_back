@@ -275,6 +275,32 @@ const manageRating = async ( req = request, res = response ) => {
     }
 }
 
+const searchAds = async ( req = request, res = response ) => {
+    try {
+        const { query } = req.params;
+        const ads = await Ad.find({
+            $or: [
+                { title : new RegExp(query, 'i') }, 
+                { description : new RegExp(query, 'i')}
+            ]
+        });
+        if ( !ads ) {
+            return res.status(400).json({
+                msg: 'No se encontraron resultados'
+            });
+        }
+        res.status(200).json({
+            totalRows: ads.length,
+            ads
+        });
+    } catch (error) {
+        console.log('CONTROLLER SEARCH ADS -->', error);
+        return res.status(500).json({
+            msg: 'No se encontraron anuncios'
+        });
+    }
+} 
+
 
 module.exports = {
     createAd,
@@ -284,5 +310,6 @@ module.exports = {
     getAdsByPublisher,
     getAds,
     manageRating,
-    getAdsByCategory
+    getAdsByCategory,
+    searchAds
 }
