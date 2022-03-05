@@ -1,7 +1,8 @@
 const { Schema, model } = require('mongoose');
 
 const schemaCategory = new Schema({
-    name: String
+    name: String,
+    key: String,
 },{
     timestamps: true
 });

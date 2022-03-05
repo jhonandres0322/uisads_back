@@ -1,12 +1,14 @@
+// Invocación de dependencias
 const express = require('express');
-const cors = require('cors');
-const MongoConnection = require('../database/db');
-const authRoutes = require('../routes/auth');
-const adRoutes = require('../routes/ad');
-const profileRoutes = require('../routes/profile');
 const morgan = require('morgan');
+const cors = require('cors');
 const path = require('path');
-
+const MongoConnection = require('../database/db');
+// Invocación de rutas
+const profileRoutes = require('../routes/profile');
+const adRoutes = require('../routes/ad');
+const authRoutes = require('../routes/auth');
+const categoryRoutes = require('../routes/category');
 class Server{
 
     constructor(){
@@ -44,6 +46,7 @@ class Server{
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.adPath, adRoutes);
         this.app.use(this.profilePath, profileRoutes );
+        this.app.use(this.categoryPath, categoryRoutes);
     }
 
     listen(){
