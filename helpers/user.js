@@ -1,6 +1,5 @@
 const bcryptjs = require('bcryptjs');
 
-
 const validatePassword = ( passDB, passUser ) => {
     return bcryptjs.compareSync( passUser, passDB );
 }

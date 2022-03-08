@@ -1,5 +1,5 @@
 const { model, Schema} = require('mongoose');
-
+const crypto = require('crypto');
 
 const schemaUser = new Schema({
     email: String,
@@ -21,7 +21,8 @@ const schemaUser = new Schema({
         default: new Date()
     },
     lastEntry: Date,
-    available: Boolean
+    available: Boolean,
+    otp: String
 }, {
     timestamps: true
 })
@@ -31,5 +32,7 @@ schemaUser.methods.toJSON = function () {
     user.uid = _id;
     return user;
 }
+
+
 
 module.exports = model('User', schemaUser);

@@ -2,6 +2,8 @@ const { request, response } = require('express');
 const User = require('../models/user');
 const { generarJWT } = require('../helpers/generate_jwt');
 const { validatePassword, createPassword } = require('../helpers/user');
+const { generateOTP } = require('../services/otp');
+const { sendEmail } = require('../services/mail');
 
 const login = async (req = request,res = response ) => {
     const { email, password } = req.body;
@@ -117,10 +119,62 @@ const changePassword = async ( req = request, res = response ) => {
     }
 }
 
+const forgotPassword = async ( req = request, res = response ) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if ( !user ) {
+            return res.status(400).json({
+                msg: 'Usuario no encontrado'
+            });
+        }
+        const otp = generateOTP();
+        const userUpdated = await User.findByIdAndUpdate( user._id, {
+            otp
+        });
+        if ( !userUpdated ) {
+            return res.status(400).json({
+                msg: 'Problemas para generar el codigo'
+            });
+        }
+        await sendEmail({
+            email: user.email,
+            OTP: otp
+        });
+        res.status(200).json({
+            msg: 'Mensaje enviado con exito. Por favor revisar el correo'
+        });
+    } catch (error) {
+        console.log('CONTROLLER FORGOT PASSWORD -->', error);
+        return res.status(500).json({
+            msg: 'No se pudo generar el codigo de verificación'
+        });
+    }
+}
+
+const validateCodeOTP = async ( req = request, res = response ) => {
+    try {
+        const { otp, email } = req.body;
+        const user = await User.findOne({otp, email});
+        if ( !user ) {
+            return res.status(400).json({
+                msg: 'OTP invalido'
+            });
+        }
+        res.status(200).json({
+            msg: 'OTP valido'
+        });
+    } catch (error) {
+        console.log(' CONTROLLER VALIDATE OTP -->', )
+    }
+}
+
 
 module.exports = {
     login,
     registerUser,
-    changePassword
+    changePassword,
+    forgotPassword,
+    validateCodeOTP
 }
 

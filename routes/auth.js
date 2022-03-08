@@ -6,7 +6,9 @@ const { check } = require('express-validator');
 const {
     login,
     registerUser,
-    changePassword
+    changePassword,
+    forgotPassword,
+    validateCodeOTP
 } = require('../controllers/auth');
 
 // Invocacion de los middlewares
@@ -34,5 +36,16 @@ router.post('/change-password',
     validateJWT,
     changePassword
 );
+
+router.post('/forget-password',
+    check('email','El correo es obligatorio').isEmail(),
+    validateFields,
+    forgotPassword
+);
+
+router.post('/verify-otp', 
+    validateCodeOTP
+);
+
 
 module.exports = router;
