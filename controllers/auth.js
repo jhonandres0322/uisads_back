@@ -44,7 +44,7 @@ const login = async (req = request,res = response ) => {
                 msg: 'Contraseña Incorrecta'
             });
         }
-        const token = await generarJWT( user._id     );
+        const token = await generarJWT( user._id );
         const lastEntry = new Date();
         await User.findByIdAndUpdate( user._id, {
             lastEntry,
@@ -75,8 +75,11 @@ const registerUser = async (req = request,res = response ) => {
                 msg: 'No se pudo guardar el usuario'
             });
         }
+        const token = await generarJWT( userSaved._id );
         return res.status(200).json({
-            msg: 'Usuario Creado con Exito'
+            msg: 'Usuario Creado con Exito',
+            token,
+            userSaved
         });
     } catch (error) {
         console.log(error);

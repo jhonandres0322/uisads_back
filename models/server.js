@@ -9,6 +9,7 @@ const profileRoutes = require('../routes/profile');
 const adRoutes = require('../routes/ad');
 const authRoutes = require('../routes/auth');
 const categoryRoutes = require('../routes/category');
+const errorHandler = require('../middlewares/error_handler');
 class Server{
 
     constructor(){
@@ -40,6 +41,7 @@ class Server{
         this.app.use( express.urlencoded({ extended: true }) );
         this.app.use('/public', express.static(path.join(__dirname, '/public')));
         this.app.use( morgan('dev') );
+        this.app.use( errorHandler );
     }
     
     routes(){
