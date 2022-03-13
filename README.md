@@ -25,4 +25,4 @@ Ejecute los siguientes comandos:
 
 ## Ejecución del proyecto
 
-    $ npm run start
+    $ npm run dev
