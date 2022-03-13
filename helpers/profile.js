@@ -1,27 +1,17 @@
+// * Llamado de las depedencias
 const res = require('express/lib/response')
+
+// * Llamado de los modelos
 const Profile = require('../models/profile')
 
-
+// * Función para buscar el perfil por el id del usuario
 const searchProfile =  async ( idUser ) => {
-    try {
-        const profile = await Profile.findOne({
-            user: idUser
-        });
-        if( !profile ) {
-            return res.status(400).json({
-                msg: 'No se encontro el perfil'
-            });
-        }
-        return profile;
-    } catch (error) {
-        console.log(' HELPER SEARCH PROFILE ERROR -->', error );
-        return res.status(500).json({
-            msg: 'Problemas en encontrar el perfil'
-        })
+    const profile = await Profile.findOne({ user: idUser });
+    if( !profile ) {
+        return false;
     }
+    return profile;
 }
-
-
 
 module.exports = {
     searchProfile

@@ -1,15 +1,18 @@
-// Invocación de dependencias
+// * Llamado de dependencias
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const path = require('path');
-const MongoConnection = require('../database/db');
-// Invocación de rutas
+
+// * Llamado de rutas
 const profileRoutes = require('../routes/profile');
 const adRoutes = require('../routes/ad');
 const authRoutes = require('../routes/auth');
 const categoryRoutes = require('../routes/category');
 const errorHandler = require('../middlewares/error_handler');
+
+// * Llamado de la conexión a la base de datos
+const MongoConnection = require('../database/db');
 class Server{
 
     constructor(){
@@ -30,11 +33,13 @@ class Server{
         this.routes();
     }
 
+    // * Conexión a la base de datos
     async connectDatabase(){
         await new MongoConnection().connect();
     }
     
 
+    // * Middlewares del servidor
     middlewares(){
         this.app.use( cors()) ;
         this.app.use( express.json() );
@@ -44,6 +49,7 @@ class Server{
         this.app.use( errorHandler );
     }
     
+    // * Rutas del servidor
     routes(){
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.adPath, adRoutes);
@@ -51,6 +57,7 @@ class Server{
         this.app.use(this.categoryPath, categoryRoutes);
     }
 
+    // * Activación del servidor
     listen(){
         this.app.listen( this.port, () => {
             console.log(`Server running on port ${this.port}`);

@@ -1,38 +1,40 @@
-// Invocación de las dependencias
+// * Llamado de dependencias
 const { Router } = require("express");
 const { check } = require('express-validator');
 
-// Invocacion de los controladores
+// * Llamado de controladores
 const { 
     createAd,
     updateAd,
     deleteAd,
     getAd,
     manageRating,
-    getAdsByPublisher, 
+    getAdsByPublisher,
     getAds,
     searchAds
 } = require("../controllers/ad");
 
-// Invocacion de los middlewares
+// * Llamado de middlewares
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require('../middlewares/validate_jwt');
 const { 
-    validateAdExists, 
-    validateOwnerAd, 
-    validateCategoryExists 
+    validateAdExists,
+    validateOwnerAd,
+    validateCategoryExists
 } = require('../middlewares/validate_ad');
 const { saveImages, upload } = require('../middlewares/upload');
 const { validateExistsProfile } = require("../middlewares/validate_user");
 
 const router = Router();
 
+// * Ruta que lista todos los anuncios
 router.get('/',
     validateJWT,
     validateFields,
     getAds
 );
 
+// * Ruta que lista un unico anuncio con toda su información
 router.get('/:id',
     validateJWT,
     check('id', 'No es un id valido').isMongoId(),
@@ -41,6 +43,7 @@ router.get('/:id',
     getAd
 );
 
+// * Ruta que lista todos los anuncios de un perfil de usuario
 router.get('/publisher/:id',
     validateJWT,
     check('id','No es un perfil valido').isMongoId(),
@@ -49,6 +52,7 @@ router.get('/publisher/:id',
     getAdsByPublisher
 );
 
+// * Ruta que lista todos los anuncios por una categoria
 router.get('/category/:id',
     validateJWT,
     check('id','No es una categoria valida').isMongoId(),
@@ -57,6 +61,7 @@ router.get('/category/:id',
     getAdsByPublisher
 )
 
+// * Ruta que crea un anuncio
 router.post('/',
     validateJWT,
     upload.array('images',5),
@@ -67,6 +72,7 @@ router.post('/',
     createAd
 );
 
+// * Ruta que actualiza un anuncio
 router.put('/:id',
     validateJWT,
     validateOwnerAd,
@@ -77,7 +83,7 @@ router.put('/:id',
     updateAd
 );
 
-
+// * Ruta que elimina un anuncio
 router.delete('/:id',
     validateJWT,
     validateOwnerAd,
@@ -87,6 +93,7 @@ router.delete('/:id',
     deleteAd
 );
 
+// * Ruta que gestiona la calificación de un anuncio
 router.post('/rating/:id', 
     validateJWT,
     check('id', 'No es un id valido').isMongoId(),
@@ -95,10 +102,10 @@ router.post('/rating/:id',
     manageRating
 );
 
+// * Ruta que busca los anuncios
 router.get('/search/:query',
     validateJWT,
     searchAds
 );
-
 
 module.exports = router;

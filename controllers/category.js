@@ -1,19 +1,17 @@
+// * Llamado de las dependencias
 const { request, response } = require('express');
+
+// * Llamado de los modelos
 const Category = require('../models/category');
 
-
+// * Controlador para mostrar todas las categorias
 const getCategories = async ( req = request, res = response ) => {
     try {
         const categories = await Category.find();
         if ( !categories ) {
-            return res.status(400).json({
-                msg: 'No se pueden listar las categorias'
+            return res.status(404).json({
+                msg: 'No se encontraron las categorias'
             })
-        }
-        if ( !categories.length ) {
-            return res.status(200).json({
-                msg: 'No existen categorias'
-            });
         }
         res.status(200).json({
             totalRows: categories.length,
@@ -27,6 +25,7 @@ const getCategories = async ( req = request, res = response ) => {
     }
 }
 
+// * Controlador para crear categorias
 const createCategory = async ( req = request, res = response ) => {
     try {
         const { name } = req.body;
@@ -53,7 +52,7 @@ const createCategory = async ( req = request, res = response ) => {
             msg: 'Categoria creada con exito'
         });
     } catch (error) {
-        console.log('CONTROLLER ERROR CREATE CATEGORY -->', error);
+        console.log('ERROR CONTROLLER CREATE CATEGORY -->', error);
         return res.status(500).json({
             msg: 'No se pueden cargar las categorias'
         });

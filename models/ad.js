@@ -1,6 +1,5 @@
 const { model, Schema } = require('mongoose');
 
-
 const schemaAd = new Schema({
     title: String,
     description: String,

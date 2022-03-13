@@ -1,8 +1,8 @@
-// Invocación de las dependencias
+// * Llamado de las dependencias
 const { Router } = require("express");
 const { check, body } = require('express-validator');
 
-// Invocación de los controladores
+// * Llamado de los controladores
 const { 
     createProfile, 
     getProfile, 
@@ -10,15 +10,15 @@ const {
     calculateRatingProfile 
 } = require("../controllers/profile");
 
-// Invocación de los middlewares
+// * Llamado de los middlewares
 const { saveImages, upload } = require("../middlewares/upload");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
 const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
 
-// Instancia del router
 const router = Router();
 
+// * Ruta para mostrar el perfil de un usuario
 router.get('/:id',
     validateJWT,
     check('id','No es un id valido').isMongoId(),
@@ -26,6 +26,7 @@ router.get('/:id',
     getProfile
 );
 
+// * Ruta para crear un perfil
 router.post('/',
     validateJWT,
     upload.single('image'),
@@ -39,6 +40,7 @@ router.post('/',
     createProfile
 );
 
+// * Ruta para actualizar un perfil
 router.put('/:id',
     validateJWT,
     check('id','No es un id valido').isMongoId(),
@@ -52,6 +54,7 @@ router.put('/:id',
     updateProfile
 );
 
+// * Ruta para calcular la calificación del perfil
 router.post('/calculate',
     validateJWT,
     calculateRatingProfile

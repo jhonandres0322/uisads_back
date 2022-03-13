@@ -10,6 +10,7 @@ const MAIL_SETTINGS = {
 
 const transporter = nodemailer.createTransport( MAIL_SETTINGS );
 
+// * Función para enviar el codigo OTP por via email
 const sendEmail = async ( params ) => {
     try {
         let info = await transporter.sendMail({

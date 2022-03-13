@@ -1,19 +1,21 @@
-const Upload = require('../models/upload');
+// * Llamado de las dependencias;
 const fs = require('fs');
-const lz = require('lz-string');
 
+//* Llamado de los modelos
+const Upload = require('../models/upload');
+
+// * Función para eliminar los uplods de la base de datos
 const deleteUploads = async ( listUploads = [] ) => {
-    try {
-        for (const upload of listUploads) {
-            await Upload.findByIdAndDelete( upload );
+    for (const upload of listUploads) {
+        const deletedUplaod = await Upload.findByIdAndDelete( upload );
+        if ( !deletedUplaod ) {
+            return false;
         }
-        return true;
-    } catch (error) {
-        console.log( "error -->", error);
-        throw new Error('No se pueden eliminar los archivos'); 
     }
+    return true;
 }
 
+// * Función para organizar las imagenes para guardarlas en la base de datos
 const organizeImage = ( file ) => {
     const content = convertFileToBase64( file.path );
     const fileNameParts = file.originalname.split('.');
@@ -24,14 +26,13 @@ const organizeImage = ( file ) => {
     }
 }
 
+// * Función para convertir la imagen a base64
 const convertFileToBase64 = ( path ) => {
     const buffer = fs.readFileSync( path );
     let bufferStr = JSON.stringify( buffer );
     console.log('type -->', typeof bufferStr);
     return bufferStr ;
 }
-
-
 
 module.exports = {
     deleteUploads,

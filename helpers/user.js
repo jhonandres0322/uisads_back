@@ -1,13 +1,13 @@
+// * Llamado de las dependencias
 const bcryptjs = require('bcryptjs');
 
-const validatePassword = ( passDB, passUser ) => {
-    return bcryptjs.compareSync( passUser, passDB );
-}
+const salt = bcryptjs.genSaltSync();
 
-const createPassword = ( pass ) => {
-    const salt = bcryptjs.genSaltSync();
-    return bcryptjs.hashSync( pass, salt )
-}
+// * Función para validar el password de la base de datos
+const validatePassword = ( passDB, passUser ) => bcryptjs.compareSync( passUser, passDB );
+
+// * Función para crer el password de una cuenta
+const createPassword = ( pass ) => bcryptjs.hashSync( pass, salt )
 
 module.exports = {
     validatePassword,

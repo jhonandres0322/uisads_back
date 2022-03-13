@@ -1,10 +1,18 @@
+// * Llamado de dependencias
 const { request, response } = require('express');
-const User = require('../models/user');
+
+// * Llamado de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
 const { validatePassword, createPassword } = require('../helpers/user');
+
+// * Llamado de modelos
+const User = require('../models/user');
+
+// * Llamado de servicios
 const { generateOTP } = require('../services/otp');
 const { sendEmail } = require('../services/mail');
 
+// * Controlador para iniciar sesión en el servidor
 const login = async (req = request,res = response ) => {
     const { email, password } = req.body;
     try {
@@ -23,7 +31,7 @@ const login = async (req = request,res = response ) => {
         }
         // Si el usuario esta activo en la base de datos
         if ( !user.state ) {
-            return res.status(400).json({
+            return res.status(404).json({
                 msg: 'Usuario no encontrado'
             });
         }
@@ -56,13 +64,14 @@ const login = async (req = request,res = response ) => {
             token
         });
     } catch (error) {
-        console.log(error);
+        console.log('ERROR CONTROLLER LOGIN -->', error );
         return res.status(500).json({
-            msg: `500 - SERVER ERROR`
+            msg: 'Error al loguearse'
         });
     }
 }
 
+// * Controlador para registrar usuarios en la plataforma
 const registerUser = async (req = request,res = response ) => {
     const { email, password } = req.body;
     try {
@@ -82,13 +91,14 @@ const registerUser = async (req = request,res = response ) => {
             userSaved
         });
     } catch (error) {
-        console.log(error);
+        console.log('ERROR CONTROLER REGISTER USER -->', error);
         return res.status(500).json({
-            msg: `500 - SERVER ERROR`
+            msg: 'No se pudo guardar el usuario'
         });
     }
 }
 
+// * Controlador para cambiar la contraseña
 const changePassword = async ( req = request, res = response ) => {
     try {
         const { passwordOld, passwordNew } = req.body;
@@ -97,15 +107,13 @@ const changePassword = async ( req = request, res = response ) => {
         const isPassword = validatePassword( userPass.password, passwordOld ); 
         if ( !isPassword ) {
             return res.status(400).json({
-                msg: 'La antigua contraseña esta mal'
+                msg: 'La contraseñas no coinciden'
             });
         }
         const password = createPassword( passwordNew );
-        console.log( password );
         const userUpdated = await User.findByIdAndUpdate( userPass._id, {
             password
         });
-        console.log(userUpdated);
         if ( !userUpdated ) {
             return res.status(400).json({
                 msg: 'No se pudo guardar la nueva contraseña'
@@ -115,13 +123,14 @@ const changePassword = async ( req = request, res = response ) => {
             msg: 'Contraseña cambiada con exito'
         });
     } catch (error) {
-        console.log('CONTROLLER CHANGE PASSWORD -->', error);
+        console.log('ERROR CONTROLLER CHANGE PASSWORD -->', error);
         return res.status(500).json({
             msg: 'Problemas para cambiar la contraseña'
         })
     }
 }
 
+// * Controlador para enviar mensaje otp para la recuperación de la contraseña
 const forgotPassword = async ( req = request, res = response ) => {
     try {
         const { email } = req.body;
@@ -140,21 +149,27 @@ const forgotPassword = async ( req = request, res = response ) => {
                 msg: 'Problemas para generar el codigo'
             });
         }
-        await sendEmail({
+        const sentEmail = await sendEmail({
             email: user.email,
             OTP: otp
         });
+        if ( !sentEmail ) {
+            return res.status(500).json({
+                msg: 'No se pudo enviar el mensaje con el codigo'
+            });
+        }
         res.status(200).json({
-            msg: 'Mensaje enviado con exito. Por favor revisar el correo'
+            msg: 'Mensaje enviado con exito. Por favor revisar el correo electronico'
         });
     } catch (error) {
-        console.log('CONTROLLER FORGOT PASSWORD -->', error);
+        console.log('ERROR CONTROLLER FORGOT PASSWORD -->', error);
         return res.status(500).json({
             msg: 'No se pudo generar el codigo de verificación'
         });
     }
 }
 
+// * Controlador para validar el codigo OTP
 const validateCodeOTP = async ( req = request, res = response ) => {
     try {
         const { otp, email } = req.body;
@@ -165,13 +180,15 @@ const validateCodeOTP = async ( req = request, res = response ) => {
             });
         }
         res.status(200).json({
-            msg: 'OTP valido'
+            msg: 'Codigo valido'
         });
     } catch (error) {
-        console.log(' CONTROLLER VALIDATE OTP -->', )
+        console.log(' CONTROLLER VALIDATE OTP -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo validar el codigo'
+        });
     }
 }
-
 
 module.exports = {
     login,

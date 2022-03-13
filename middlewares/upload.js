@@ -1,12 +1,17 @@
+// * Llamado de las dependencias
 const { request, response } = require('express');
 const multer = require('multer');
-const { organizeImage } = require('../helpers/uploads');
+
+// * Llamado de los modelos
 const Upload = require('../models/upload');
 
+// * Llamado de los helpers
+const { organizeImage } = require('../helpers/uploads');
 
+// * Middleware para generar el storage del multer
 const storage = multer.diskStorage({
     destination: ( req, file, cb ) => {
-        cb( null, './uploads');
+        cb( null, process.env.PATH_UPLOAD );
     },
     filename: ( req, file, cb ) => {
         const filename = file.originalname.toLowerCase().split(' ').join('-');
@@ -14,32 +19,27 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({
-    storage
-});
+// * Middleware para generar la instancia de multer en el servidor
+const upload = multer({ storage });
 
+// * Middleware para guardar las imagenes en la base de datos
 saveImages = async (req = request, res = response, next) => {
+    try {
         const url = req.baseUrl.toString();
         if ( url.includes('ad') ) {
             if( req.files && req.files.length > 0 ) {
                 let idsUpload = [];
                 for (let i = 0; i < req.files.length; i++) {
                     const upload = organizeImage( req.files[i] );
-                    console.log('content ->', upload.content.length);
                     const newUpload = new Upload(upload);
-                    const savedUpload = await newUpload.save();
-                    if( !savedUpload ) {
-                        return res.status(400).json({
-                            msg: 'No se pudo guardar los adjuntos'
-                        });
-                    }
-                    idsUpload.push( savedUpload._id );
+                    const uploadCreated = await newUpload.save();
+                    idsUpload.push( uploadCreated._id );
                     req.images = idsUpload;
                 }
                 next();
             } else {
-                return res.status(401).json({
-                    msg: 'El anuncio debe tener dos imagenes'
+                return res.status(400).json({
+                    msg: 'El anuncio debe tener mas de una imagen'
                 });
             }
         } else {
@@ -51,41 +51,13 @@ saveImages = async (req = request, res = response, next) => {
             }
             next();
         }
-    // try {
-    //     const url = req.baseUrl.toString();
-    //     if ( url.includes('ad') ) {
-    //         if( req.files && req.files.length > 0 ) {
-    //             let idsUpload = [];
-    //             for (let i = 0; i < req.files.length; i++) {
-    //                 const upload = organizeImage( req.files[i] );
-    //                 const newUpload = new Upload(upload);
-    //                 const uploadCreated = await newUpload.save();
-    //                 idsUpload.push( uploadCreated._id );
-    //                 req.images = idsUpload;
-    //             }
-    //             next();
-    //         } else {
-    //             return res.status(401).json({
-    //                 msg: 'El anuncio debe tener dos imagenes'
-    //             });
-    //         }
-    //     } else {
-    //         if ( req.file ) {
-    //             const upload = organizeImage( req.file );
-    //             const newUpload = new Upload(upload);
-    //             const uploadCreated = await newUpload.save();
-    //             req.image = uploadCreated._id;
-    //         }
-    //         next();
-    //     }
-    // } catch (error) {
-    //     console.log("Error Middleware saveImages -->", error);
-    //     return res.status(401).json({
-    //         msg: 'No existe imagenes para el anuncio'
-    //     });
-    // }
+    } catch (error) {
+        console.log("Error Middleware saveImages -->", error);
+        return res.status(401).json({
+            msg: 'No existe imagenes para el anuncio'
+        });
+    }
 }
-
 
 module.exports = {
     saveImages,

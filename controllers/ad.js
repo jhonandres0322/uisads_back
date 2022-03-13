@@ -1,14 +1,16 @@
+// * Llamado de las dependencias
 const { request, response } = require('express');
-const Ad = require('../models/ad');
+
+// * Llamado de los helpers
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
-const Rating = require('../models/rating');
 const { makePagination } = require('../helpers/ads');
 
+// * Llamado de los modelos
+const Rating = require('../models/rating');
+const Ad = require('../models/ad');
 
-// puntos positivos
-// fecha de publicación
-
+// * Controlador para mostrar todos los anuncios
 const getAds = async( req = request, res = response ) => {
     try {
         const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
@@ -21,19 +23,24 @@ const getAds = async( req = request, res = response ) => {
             direction: sortDirection
         };
         const ads = await makePagination(page, sort, {} , filter );
-        const totalRow = ads.length;
+        if ( !ads ) {
+            return res.status(404).json({
+                msg: 'No se encontraron anuncios'
+            });
+        }
         res.status(200).json({
-            totalRow,
             ads 
         });
-    } catch (error) {
-        console.log(` ERROR CONTROLLER GET ADS --> ${error} `)
+    } catch (error ) {
+        console.log(` ERROR CONTROLER GET ADS --> ${error} `)
         return res.status(500).json({
             msg: 'No se pueden visualizar los anuncios'
         })
     }
 }
 
+
+// * Controlador para mostrar los anuncios por categorias
 const getAdsByCategory = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
@@ -47,10 +54,15 @@ const getAdsByCategory = async ( req = request, res = response ) => {
             direction: sortDirection
         };
         const condition = {
-            key : 'publisher',
+            key : 'category',
             value : id
         };
         const ads = await makePagination(page, sort, condition, filter );
+        if ( !ads ) {
+            return res.status(404).json({
+                msg: 'No se encontraron anuncios'
+            });
+        }
         const totalRow = ads.length;
         res.status(200).json({
             totalRow,
@@ -64,6 +76,7 @@ const getAdsByCategory = async ( req = request, res = response ) => {
     }
 }
 
+// * Controlador para mostrar los anuncios por publicador
 const getAdsByPublisher = async ( req = request, res = response) => {
     try {
         const { id } = req.params;
@@ -81,6 +94,11 @@ const getAdsByPublisher = async ( req = request, res = response) => {
             value : id
         };
         const ads = await makePagination(page, sort, condition, filter );
+        if ( !ads ) {
+            return res.status(404).json({
+                msg: 'No se encontraron anuncios'
+            });
+        }
         const totalRow = ads.length;
         res.status(200).json({
             totalRow,
@@ -94,6 +112,7 @@ const getAdsByPublisher = async ( req = request, res = response) => {
     }
 }
 
+// * Controlador para mostrar un anuncio
 const getAd = async( req = request, res = response ) => {
     const { id } = req.params;
     try {
@@ -110,23 +129,29 @@ const getAd = async( req = request, res = response ) => {
             ad
         });
     } catch (error) {
-        console.log( 'error -->', error);
+        console.log( 'ERROR CONTROLLER GET AD -->', error);
         return res.status(500).json({
             msg: 'No se puede visualizar el anuncio'
         });
     }
 }
 
+// * Controlador para crear un anuncio
 const createAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { user } = req;
     const { images } = req;
     try {
-        const { id } = await searchProfile( user._id );
+        const profile  = await searchProfile( user._id );
+        if ( !profile ) {
+            return res.status(404).json({
+                msg : 'No se encontro el perfil de usuario'
+            });
+        }
         const adNew = new Ad({
             title,
             description,
-            publisher: id,
+            publisher: profile._id,
             images
         });
         const adSaved = await adNew.save();
@@ -139,13 +164,14 @@ const createAd = async( req = request, res = response ) => {
             msg: 'Se ha guardado el anuncio con exito'
         });
     } catch (error) {
-        console.log( 'error -->', error);
+        console.log( 'ERROR CONTROLLER CREATE AD -->', error);
         return res.status(500).json({
             msg: 'No se pudo guardar el anuncio'
         });
     }
 }
 
+// * Controlador para actualizar un anuncio
 const updateAd = async( req = request, res = response ) => {
     const { title, description } = req.body;
     const { id } = req.params;
@@ -163,24 +189,25 @@ const updateAd = async( req = request, res = response ) => {
             msg: 'El anuncio se actualizo con exito'
         });
     } catch (error) {
-        console.log( 'error -->', error);
+        console.log( 'ERROR CONTROLER UPDATE AD -->', error);
         return res.status(500).json({
             msg: 'No se pudo actualizar el anuncio'
         });
     }
 }
 
+// * Controlador para eliminar un anuncio
 const deleteAd = async( req = request, res = response ) => {
     try {
         const { id } = req.params;
-        const uploads = adsDelete.images;
-        if ( !deleteUploads( uploads ) ) {
+        const adsDelete = await Ad.findByIdAndUpdate(id, { state: false });
+        if( !adsDelete.state ) {
             return res.status(400).json({
-                msg: 'No se pudo eliminar el anuncio'
+                msg: 'El anuncio ya se ha borrado'
             });
         }
-        const adsDelete = await Ad.findByIdAndUpdate(id, { state: false });
-        if( !adsDelete ) {
+        const uploads = adsDelete.images;
+        if ( !deleteUploads( uploads ) ) {
             return res.status(400).json({
                 msg: 'No se pudo eliminar el anuncio'
             });
@@ -189,13 +216,14 @@ const deleteAd = async( req = request, res = response ) => {
             msg: 'Anuncio eliminado con exito'
         });
     } catch (error) {
-        console.log( 'error -->', error);
+        console.log( 'ERROR CONTROLLER DELETE AD -->', error);
         return res.status(500).json({
             msg: 'No se pudo eliminar el anuncio'
         });
     }
 }
 
+// * Controlador para gestionar las calificaciones de un anuncio
 const manageRating = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
@@ -268,13 +296,14 @@ const manageRating = async ( req = request, res = response ) => {
             }
         }
     } catch (error) {
-        console.log( 'error -->', error);
+        console.log( 'ERROR CONTROLLER MANAGE RATING -->', error);
         return res.status(500).json({
             msg: 'No se pudo registrar su votación'
         });
     }
 }
 
+// * Controlador para buscar anuncios
 const searchAds = async ( req = request, res = response ) => {
     try {
         const { query } = req.params;
@@ -285,7 +314,7 @@ const searchAds = async ( req = request, res = response ) => {
             ]
         });
         if ( !ads ) {
-            return res.status(400).json({
+            return res.status(404).json({
                 msg: 'No se encontraron resultados'
             });
         }

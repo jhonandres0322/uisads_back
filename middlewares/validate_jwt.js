@@ -1,8 +1,12 @@
+// * Llamado de las depedencias
 const { response, request } = require('express');
-
 const jwt = require('jsonwebtoken');
+
+// * Llamado del modelo
 const User = require('../models/user');
 
+// * Middleware que valida un token enviado desde el request
+// * Ademas valida si el usuario se encuentra registrado
 const validateJWT = async ( req = request,res = response, next) => {
     const token = req.header("access-token");
     if ( !token ) {
@@ -11,7 +15,7 @@ const validateJWT = async ( req = request,res = response, next) => {
         });
     }
     try {
-        const { uid } = jwt.verify( token, process.env.SECRET_KEY );
+        const { uid } = jwt.verify( token, process.env.JWT_SECRET_KEY );
         // Leer al usuario
         const userAuth = await User.findById(uid);
         if( !userAuth ) {
@@ -19,7 +23,7 @@ const validateJWT = async ( req = request,res = response, next) => {
                 msg: 'Token no valido'
             });
         }
-        // Verificar si el uid tiene estado true
+        // Verificar si el usuario tiene estado true
         if( !userAuth.state ) {
             return res.status(401).json({
                 msg: 'Token no valido'
