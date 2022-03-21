@@ -3,7 +3,6 @@ const { Schema, model } = require('mongoose');
 const schemaProfile = new Schema({
     name: String,
     cellphone: String,
-    city: String,
     image: {
         type: Schema.Types.ObjectId,
         ref: 'Upload'
