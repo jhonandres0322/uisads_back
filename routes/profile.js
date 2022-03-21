@@ -35,7 +35,6 @@ router.post('/',
     check('name','El nombre es obligatorio').not().isEmpty(),
     check('cellphone', 'El telefono es obligatorio').not().isEmpty(),
     check('cellphone','Debe ser un número de telefono valido').isMobilePhone('es-CO'),
-    check('city','La ciudad es obligatoria').not().isEmpty(),
     validateFields,
     createProfile
 );

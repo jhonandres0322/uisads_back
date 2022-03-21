@@ -27,10 +27,6 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Rating'
     },
-    report: {
-        type: Schema.Types.ObjectId,
-        ref: 'Report'
-    }
 },{
     timestamps: true
 });

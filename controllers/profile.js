@@ -32,13 +32,12 @@ const getProfile = async ( req = request, res = response ) => {
 // * Controlador para crear perfil
 const createProfile = async (req = request, res = response ) => {
     try {
-        const { name, cellphone, city } = req.body;
+        const { name, cellphone } = req.body;
         const { user } = req;
         const { image } = req;
         const newProfile = new Profile({
             name,
             cellphone,
-            city,
             user: user._id,
             image
         });
@@ -64,11 +63,11 @@ const createProfile = async (req = request, res = response ) => {
 const updateProfile = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
-        const { name, cellphone, city } = req.body;
+        const { name, cellphone } = req.body;
         const { user } = req;
         const { image } = req;
         const updatedProfile = await Profile.findByIdAndUpdate( id, {
-            name, cellphone, city, user : user._id, image 
+            name, cellphone, user : user._id, image 
         });
         if ( !updatedProfile ) {
             return res.status(400).json({
