@@ -19,7 +19,19 @@ const schemaProfile = new Schema({
     rating: {
         type: Schema.Types.ObjectId,
         ref: 'Rating'
-    }
+    },
+    interests: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Interest'
+    }],
+    favorites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Ad'
+    }],
+    historial: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Ad'
+    }]
 },{
     timestamps: true
 });
