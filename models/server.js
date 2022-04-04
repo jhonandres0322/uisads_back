@@ -9,6 +9,7 @@ const profileRoutes = require('../routes/profile');
 const adRoutes = require('../routes/ad');
 const authRoutes = require('../routes/auth');
 const categoryRoutes = require('../routes/category');
+const uploadRoutes = require('../routes/upload');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -53,8 +54,9 @@ class Server{
     routes(){
         this.app.use(this.authPath, authRoutes);
         this.app.use(this.adPath, adRoutes);
-        this.app.use(this.profilePath, profileRoutes );
+        this.app.use(this.profilePath, profileRoutes);
         this.app.use(this.categoryPath, categoryRoutes);
+        this.app.use(this.uploadPath, uploadRoutes);
     }
 
     // * Activación del servidor

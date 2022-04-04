@@ -17,10 +17,10 @@ const deleteUploads = async ( listUploads = [] ) => {
 
 // * Función para organizar las imagenes para guardarlas en la base de datos
 const organizeImage = ( file ) => {
+    console.log( 'file -->', file );
     const content = convertFileToBase64( file.path );
-    const fileNameParts = file.originalname.split('.');
-    const name = fileNameParts[0];
-    const type = fileNameParts[1];
+    const name = file.originalname;
+    const type = file.mimetype;
     return {
         content,name,type
     }

@@ -23,33 +23,36 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // * Middleware para guardar las imagenes en la base de datos
-saveImages = async (req = request, res = response, next) => {
+const saveImages = async (req = request, res = response, next) => {
     try {
-        const url = req.baseUrl.toString();
-        if ( url.includes('ad') ) {
-            if( req.files && req.files.length > 0 ) {
-                let idsUpload = [];
-                for (let i = 0; i < req.files.length; i++) {
-                    const upload = organizeImage( req.files[i] );
+        const { type } = req.body;
+        switch (type) {
+            case 'ad':
+                if ( req.files && req.files.length > 0 ) {
+                    let idsUploads = [];
+                    for ( let i = 0; i < req.files.length; i++ ) {
+                        const uploadSave = organizeImage( req.files[i] );
+                        const newUpload = new Upload( uploadSave );
+                        const uploadCreated = await newUpload.save();
+                        idsUploads.push( uploadCreated._id );
+                    }
+                    req.images = idsUploads;
+                    next();
+                } else {
+                    return res.status(400).json({
+                        msg: 'El anuncio debe tener mas de una imagen'
+                    });
+                }
+                break;
+            case 'profile':
+                if ( req.file ) {
+                    const upload = organizeImage( req.file );
                     const newUpload = new Upload(upload);
                     const uploadCreated = await newUpload.save();
-                    idsUpload.push( uploadCreated._id );
-                    req.images = idsUpload;
+                    req.image = uploadCreated._id;
+                    next();
                 }
-                next();
-            } else {
-                return res.status(400).json({
-                    msg: 'El anuncio debe tener mas de una imagen'
-                });
-            }
-        } else {
-            if ( req.file ) {
-                const upload = organizeImage( req.file );
-                const newUpload = new Upload(upload);
-                const uploadCreated = await newUpload.save();
-                req.image = uploadCreated._id;
-            }
-            next();
+                break;
         }
     } catch (error) {
         console.log("Error Middleware saveImages -->", error);
