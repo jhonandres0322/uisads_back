@@ -21,6 +21,7 @@ const organizeImage = ( file ) => {
     const content = convertFileToBase64( file.path );
     const name = file.originalname;
     const type = file.mimetype;
+    fs.unlinkSync( file.path );
     return {
         content,name,type
     }
