@@ -1,6 +1,6 @@
 // * Llamado de dependencias
 const { Router } = require("express");
-const { check, body } = require('express-validator');
+const { check } = require('express-validator');
 
 // * Llamado de controladores
 const { 
@@ -67,7 +67,6 @@ router.post('/',
     upload.array('images',5),
     saveImages,
     check('title', 'El titulo del anuncio es obligatorio').not().isEmpty(),
-    check('title','El titulo no puede superar los 30').isLength(30),
     check('description','La descripción es obligatoria').not().isEmpty(),
     validateFields,
     createAd
@@ -80,9 +79,6 @@ router.put('/:id',
     upload.array('images',5),
     check('id','No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
-    check('title','El titulo no puede superar los 30')
-        .if( body('title').exists() )
-        .isLength(30),
     validateFields,
     updateAd
 );
