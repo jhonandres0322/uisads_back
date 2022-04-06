@@ -23,14 +23,6 @@ const schemaProfile = new Schema({
     interests: [{
         type: Schema.Types.ObjectId,
         ref: 'Interest'
-    }],
-    favorites: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Ad'
-    }],
-    historial: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Ad'
     }]
 },{
     timestamps: true
