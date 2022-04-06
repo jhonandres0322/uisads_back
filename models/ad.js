@@ -19,6 +19,7 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Category'
     },
+    visible: Boolean,
     state: {
         type: Boolean,
         default: true

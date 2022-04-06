@@ -138,7 +138,7 @@ const getAd = async( req = request, res = response ) => {
 
 // * Controlador para crear un anuncio
 const createAd = async( req = request, res = response ) => {
-    const { title, description } = req.body;
+    const { title, description, visible } = req.body;
     const { user } = req;
     const { images } = req;
     try {
@@ -151,6 +151,7 @@ const createAd = async( req = request, res = response ) => {
         const adNew = new Ad({
             title,
             description,
+            visible,
             publisher: profile._id,
             images
         });
@@ -173,12 +174,13 @@ const createAd = async( req = request, res = response ) => {
 
 // * Controlador para actualizar un anuncio
 const updateAd = async( req = request, res = response ) => {
-    const { title, description } = req.body;
+    const { title, description, visible } = req.body;
     const { id } = req.params;
     try {
         const adUpdate = await Ad.findByIdAndUpdate(id,{
             title,
-            description
+            description,
+            visible
         });
         if ( !adUpdate ) {
             return res.status(401).json({
