@@ -19,8 +19,9 @@ const { validateJWT } = require('../middlewares/validate_jwt');
 const router = Router();
 
 // * Ruta para loguearse en la aplicación
-router.post('/login', 
-    check('email', 'El correo es obligatorio').isEmail(),
+router.post('/login',
+    check('email', 'El correo es obligatorio').not().isEmpty(),
+    check('email', 'El correo debe ser valido').isEmail(),
     check('password','La contraseña es obligatoria').not().isEmpty(),
     validateFields,
     login 
@@ -28,7 +29,8 @@ router.post('/login',
 
 // * Ruta para registrar un nuevo usuario
 router.post('/register',
-    check('email','El correo es obligatorio').isEmail(), 
+    check('email', 'El correo es obligatorio').not().isEmpty(),
+    check('email', 'El correo debe ser valido').isEmail(), 
     check('password','La contraseña es obligatoria').not().isEmpty(),
     check('email').custom(isEmailExists),
     validateFields,
@@ -43,7 +45,8 @@ router.post('/change-password',
 
 // * Ruta para pedir un nuevo cambio de contraseña
 router.post('/forget-password',
-    check('email','El correo es obligatorio').isEmail(),
+    check('email', 'El correo es obligatorio').not().isEmpty(),
+    check('email','El correo debe ser valido').isEmail(),
     validateFields,
     forgotPassword
 );

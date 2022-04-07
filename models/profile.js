@@ -16,14 +16,10 @@ const schemaProfile = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    rating: {
-        type: Schema.Types.ObjectId,
-        ref: 'Rating'
-    },
-    interests: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Interest'
-    }]
+    score: {
+        type: Number,
+        default: 0
+    }
 },{
     timestamps: true
 });

@@ -10,7 +10,6 @@ const makePagination = async ( page = { }, sort = {}, condition = { }, filter = 
         [filter.key]: new RegExp(filter.value, 'i')
     })
     .populate('publisher')
-    .populate('rating')
     .populate('category')
     .sort({ [ sort.value ] : sort.direction })
     .skip(( page.number - 1 ) * page.size )
@@ -21,6 +20,39 @@ const makePagination = async ( page = { }, sort = {}, condition = { }, filter = 
     return ads;
 }
 
+const updatePointsAd = async (choice, ad, type) => {
+
+    ad.positive_points = ad.positive_points ;
+    ad.negative_points = ad.negative_points ;
+    if ( type == 'update' ) {
+        if ( choice == 'like' ) {
+            ad.positive_points++;
+            ad.negative_points--;
+        } else {
+            ad.positive_points--;
+            ad.negative_points++;
+        }
+    } else {
+        choice == 'like'
+        ? ad.positive_points++
+        : ad.negative_points++
+    }
+    ad.score = ad.positive_points - ad.negative_points;
+    const updateAd = await Ad.findByIdAndUpdate({
+        _id: ad._id
+    },{
+        score: ad.score,
+        positive_points: ad.positive_points,
+        negative_points: ad.negative_points
+    });
+    if (!updateAd) {
+        return false;
+    } else  {
+        return true;
+    }
+}
+
 module.exports = {
-    makePagination
+    makePagination,
+    updatePointsAd
 }

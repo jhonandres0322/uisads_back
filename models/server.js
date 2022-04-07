@@ -39,13 +39,11 @@ class Server{
         await new MongoConnection().connect();
     }
     
-
     // * Middlewares del servidor
     middlewares(){
         this.app.use( cors()) ;
         this.app.use( express.json() );
         this.app.use( express.urlencoded({ extended: true }) );
-        this.app.use('/public', express.static(path.join(__dirname, '/public')));
         this.app.use( morgan('dev') );
         this.app.use( errorHandler );
     }

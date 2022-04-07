@@ -4,11 +4,12 @@ const { request, response } = require('express');
 // * Llamado de los helpers
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
-const { makePagination } = require('../helpers/ads');
+const { makePagination, updatePointsAd } = require('../helpers/ads');
 
 // * Llamado de los modelos
-const Rating = require('../models/rating');
 const Ad = require('../models/ad');
+const Profile = require('../models/profile');
+const Vote = require('../models/vote');
 
 // * Controlador para mostrar todos los anuncios
 const getAds = async( req = request, res = response ) => {
@@ -118,8 +119,7 @@ const getAd = async( req = request, res = response ) => {
     try {
         const ad = await Ad.findById(id)
                             .populate('images')
-                            .populate('publisher')
-                            .populate('rating');
+                            .populate('publisher');
         if ( !ad ) {
             return res.status(400).json({
                 msg: 'No se encontro el anuncio'
@@ -226,76 +226,80 @@ const deleteAd = async( req = request, res = response ) => {
 }
 
 // * Controlador para gestionar las calificaciones de un anuncio
+/**
+* 
+* @param {*} id: id del anuncio que se va calificar
+* @param {*} choice: opción escogida por el usuario -> Opciones: Like o Dislike
+*
+*/
 const manageRating = async ( req = request, res = response ) => {
     try {
-        const { id } = req.params;
-        const { choice } = req.body;
+        const { id } = req.params; 
+        const { user } = req;
+        const { choice } = req.body; 
         const options = ['like', 'dislike'];
         const isOptionValidate = options.find( opt => opt == choice )
         if ( !isOptionValidate ) {
             return res.status(400).json({
-                msg: 'Escoja una opción valida'
+                msg: 'No es escogio una opción valida'
             });
         }
-        const ad = await Ad.findById( id );
+        const profile = await Profile.findOne({ user: user._id });
+        if ( !profile ) {
+            return res.status(400).json({
+                msg: 'Perfil no encontrado'
+            });
+        }
+        const ad = await Ad.findById(id);
         if ( !ad ) {
             return res.status(400).json({
-                msg: 'No se encontro el anuncio'
+                msg: 'El anuncio no existe'
             });
         } else {
-            if( ad.rating ) {
-                const rating = await Rating.findById( ad.rating );
-                if ( !rating ) {
+            const vote = await Vote.findOne({
+                voter: profile._id,
+                ad: ad._id
+            });
+            let updatePoints;
+            if ( vote ) {
+                if ( vote.type == choice ) {
                     return res.status(400).json({
-                        msg: 'No se pudo registrar su votación'
-                    });
+                        msg: 'Ya califico este anuncio'
+                    })
+                } else {
+                    const voteUpdated = await Vote.findByIdAndUpdate(
+                        vote._id,
+                        { type: choice }
+                    );
+                    if ( !voteUpdated ) {
+                        return res.status(400).json({
+                            msg: 'No se pudo calificar el anuncio'
+                        });
+                    }
+                    updatePoints = await updatePointsAd(choice, ad, 'update' );
                 }
-                choice == 'like' 
-                ? rating.positive_points++ 
-                : rating.negative_points++
-                rating.score = rating.positive_points - rating.negative_points;
-                const ratingUpdated = await Rating.findByIdAndUpdate( rating._id, {
-                    score: rating.score,
-                    positive_points: rating.positive_points,
-                    negative_points: rating.negative_points
-                });
-                if ( !ratingUpdated ) {
-                    return res.status(400).json({
-                        msg: 'No se pudo registrar su votación'
-                    });
-                } 
-                return res.status(200).json({
-                    msg: 'Voto registrado con exito'
-                });
             } else {
-                let positive_points = 0;
-                let negative_points = 0;
-                const newRating = new Rating();
-                choice == 'like'
-                ? positive_points++
-                : negative_points++
-                let score = positive_points - negative_points;
-                newRating.positive_points = positive_points;
-                newRating.negative_points = negative_points;
-                newRating.score = score;
-                const savedRating = await newRating.save();
-                if ( !savedRating ) {
+                const newVote = await Vote({
+                    voter: profile._id,
+                    ad: ad._id,
+                    type: choice
+                });
+                const votedSaved = await newVote.save();
+                if ( !votedSaved ) {
                     return res.status(400).json({
-                        msg: 'No se pudo registrar su votación'
+                        msg: 'No se pudo calificar el anuncio'
                     });
                 }
-                const updatedAd = await Ad.findByIdAndUpdate( ad._id, {
-                    rating: savedRating._id
-                });
-                if( !updatedAd ) {
-                    return res.status(400).json({
-                        msg: 'No se pudo registrar su votación'
-                    });
-                }
-                return res.status(200).json({
-                    msg: 'Voto registrado con exito'
-                });
+                updatePoints = await updatePointsAd(choice, ad, 'new' );
             }
+            if ( !updatePoints ) {
+                return res.status(400).json({
+                    msg: 'No se pudo guardar la calificación'
+                })
+            }
+            res.status(200).json({
+                msg: 'Se ha calificado con exito'
+            });
         }
     } catch (error) {
         console.log( 'ERROR CONTROLLER MANAGE RATING -->', error);

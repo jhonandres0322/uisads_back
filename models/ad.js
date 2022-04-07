@@ -24,10 +24,18 @@ const schemaAd = new Schema({
         type: Boolean,
         default: true
     },
-    rating: {
-        type: Schema.Types.ObjectId,
-        ref: 'Rating'
+    positive_points: {
+        type: Number,
+        default: 0
     },
+    negative_points: {
+        type: Number,
+        default: 0
+    },
+    score: {
+        type: Number,
+        default: 0
+    }
 },{
     timestamps: true
 });

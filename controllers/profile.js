@@ -4,7 +4,7 @@ const { request, response } = require("express");
 // * Llamado de los modelos
 const Profile = require('../models/profile');
 const Ad = require('../models/ad');
-const Rating = require('../models/rating');
+const ad = require("../models/ad");
 
 // * Controlador para ver el perfil
 const getProfile = async ( req = request, res = response ) => {
@@ -95,41 +95,21 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
                 msg: 'No se pudo calcular la calificación del usuario'
             });
         } 
-        const ads = await Ad.find({ publisher: profile._id }).populate('rating');
-        let positive_points = 0;
-        let negative_points = 0;
-        let score = 0;
-        for (const ad of ads) {
-            if ( ad.rating ) {
-                positive_points += ad.rating.positive_points;
-                negative_points += ad.rating.negative_points;
-                score = positive_points - negative_points;
-            }
-        }
-        if ( profile.rating ) {
-            const updatedRating = await Rating.findByIdAndUpdate( profile.rating, {
-                positive_points, negative_points, score
+        const ads = await Ad.find({ publisher: profile._id });
+        let points_positive = 0;
+        let points_negative = 0;
+        ads.forEach(element => {
+            points_positive += element.positive_points;
+            points_negative += element.negative_points;
+        });
+        const score = points_positive - points_negative;
+        const profileUpdated = await Profile.findOneAndUpdate({user},{
+            score
+        });
+        if ( !profileUpdated ) {
+            return res.status(400).json({
+                msg: 'No se pudo generar la calificación'
             });
-            if ( !updatedRating ) {
-                return res.status(400).json({
-                    msg: 'No se pudo calcular la calificación del usuario'
-                });
-            }
-        } else {
-            const newRating = new Rating({
-                positive_points,
-                negative_points,
-                score
-            });
-            const createdRating = await newRating.save();
-            if ( !createdRating ) {
-                return res.status(400).json({
-                    msg: 'No se pudo calcular la calificación del usuario'
-                });
-            }
-            const updatedProfile = await Profile.findByIdAndUpdate( profile._id, {
-                rating: createdRating._id
-            })
         }
         res.status(200).json({
             msg: 'Calificación calculada con exito'

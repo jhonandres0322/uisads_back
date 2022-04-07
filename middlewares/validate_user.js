@@ -5,7 +5,7 @@ const { request, response } = require('express');
 const User = require('../models/user');
 const Profile = require('../models/profile');
 
-// * Middleware para validar si el usuario existe con ese email
+// * Middleware para validar si ya existe un usuario con ese email
 const isEmailExists = async ( email = '' ) => {
     const existsEmail = await User.findOne({ email });
     if( existsEmail ) {
