@@ -22,9 +22,6 @@ const schemaUser = new Schema({
     lastEntry: Date,
     available: Boolean,
     otp: String,
-    guest: Boolean,
-    facebook: Boolean,
-    google: Boolean
 }, {
     timestamps: true
 })
