@@ -11,10 +11,6 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     }],
-    post_date: {
-        type: Date,
-        default: new Date()
-    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category'
