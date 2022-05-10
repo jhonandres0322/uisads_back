@@ -4,7 +4,6 @@ const { request, response } = require("express");
 // * Llamado de los modelos
 const Profile = require('../models/profile');
 const Ad = require('../models/ad');
-const ad = require("../models/ad");
 
 // * Controlador para ver el perfil
 const getProfile = async ( req = request, res = response ) => {

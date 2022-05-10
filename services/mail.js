@@ -30,8 +30,7 @@ const sendEmail = async ( params ) => {
         });
         return info;
     } catch (error) {
-        console.log('ERROR SERVICE SEND EMAIL -->', error);
-        return false;
+        throw new Error(`No se pudo enviar el correo con el codigo ${error}`);
     }
 }
 

@@ -4,6 +4,7 @@ const { request, response } = require('express');
 // * Llamado de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
 const { validatePassword, createPassword } = require('../helpers/user');
+const { errorHandler } = require('../helpers/error_handler');
 
 // * Llamado de modelos
 const User = require('../models/user');
@@ -19,21 +20,21 @@ const login = async (req = request,res = response ) => {
         // Verificar si el email existe
         const user = await User.findOne({ email });
         if ( !user ) {
-            return res.status(400).json({
-                msg: `No existe una cuenta con el correo ${email}`
-            });
+            const msg = `No existe una cuenta con el correo ${email}`;
+            const errors = errorHandler( msg, 'email');
+            return res.status(400).json({ errors });
         }
         // Verificar si el usuario se encuentra bloqueado
         if ( user.blocked ) {
-            return res.status(400).json({
-                msg: 'El usuario se encuentra bloqueado'
-            })
+            const msg = 'El usuario se encuentra bloqueado';
+            const errors = errorHandler( msg, 'blocked');
+            return res.status(400).json({ errors });
         }
         // Si el usuario esta activo en la base de datos
         if ( !user.state ) {
-            return res.status(404).json({
-                msg: 'Usuario no encontrado'
-            });
+            const msg = 'Usuario no encontrado';
+            const errors = errorHandler( msg, 'state');
+            return res.status(404).json({ errors });
         }
         // Verificar la contraseña
         const isPassword = validatePassword( user.password, password );
@@ -47,10 +48,10 @@ const login = async (req = request,res = response ) => {
                     retry: 0,
                     blocked: true
                 });
-            } 
-            return res.status(400).json({
-                msg: 'Contraseña Incorrecta'
-            });
+            }
+            const msg = 'Contraseña Incorrecta';
+            const errors = errorHandler( msg, 'password');
+            return res.status(400).json( errors );
         }
         const token = await generarJWT( user._id );
         const lastEntry = new Date();
@@ -64,10 +65,9 @@ const login = async (req = request,res = response ) => {
             token
         });
     } catch (error) {
-        console.log('ERROR CONTROLLER LOGIN -->', error );
-        return res.status(500).json({
-            msg: 'Error al loguearse'
-        });
+        const msg = 'Error al loguearse';
+        const errors = errorHandler(msg,'server');
+        return res.status(500).json( errors );
     }
 }
 
