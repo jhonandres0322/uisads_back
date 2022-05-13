@@ -4,6 +4,10 @@ const { request, response } = require("express");
 // * Llamado de los modelos
 const Profile = require('../models/profile');
 const Ad = require('../models/ad');
+const { errorHandler } = require("../helpers/error_handler");
+
+let msg;
+let errors;
 
 // * Controlador para ver el perfil
 const getProfile = async ( req = request, res = response ) => {
@@ -13,15 +17,17 @@ const getProfile = async ( req = request, res = response ) => {
                                     .populate('image')
                                     .populate('rating');
         if ( !profile ) {
-            return res.status(404).json({
-                msg: 'No se encontro el perfil'
-            });
+            msg = 'No se encontro el perfil';
+            errors = errorHandler( msg );
+            return res.status(404).json({ errors });
         }
         res.status(200).json({
             profile
         });
     } catch (error) {
         console.log('ERROR CONTROLLER GET PROFILE -->', error);
+        msg = 'No se pudo crear el perfil';
+        errors = errorHandler( msg );
         return res.status(500).json({
             msg: 'No se pudo crear el perfil'
         })
@@ -42,9 +48,9 @@ const createProfile = async (req = request, res = response ) => {
         });
         const savedProfile = await newProfile.save();
         if( !savedProfile ) {
-            return res.status(404).json({
-                msg: 'No se pudo crear el perfil'
-            });
+            msg = 'No se pudo crear el perfil';
+            errors = errorHandler( msg );
+            return res.status(404).json({ errors });
         }
         res.status(200).json({
             msg: 'Perfil creado con exito',
@@ -52,9 +58,9 @@ const createProfile = async (req = request, res = response ) => {
         });
     } catch (error) {
         console.log('ERROR CONTROLLER CREATE PROFILE -->', error);
-        return res.status(500).json({
-            msg: 'No se pudo crear el perfil'
-        })
+        msg = 'No se pudo crear el perfil';
+        errors = errorHandler( msg );
+        return res.status(500).json({ errors })
     }
 }
 
@@ -69,6 +75,8 @@ const updateProfile = async ( req = request, res = response ) => {
             name, cellphone, user : user._id, image 
         });
         if ( !updatedProfile ) {
+            msg = 'No se pudo crear el perfil';
+            errors = errorHandler( msg );
             return res.status(400).json({
                 msg: 'No se pudo crear el perfil'
             });
@@ -78,6 +86,8 @@ const updateProfile = async ( req = request, res = response ) => {
         });
     } catch (error) {
         console.log('ERROR CONTROLLER UPDATE PROFILE -->', error);
+        msg = 'No se pudo actualizar el perfil';
+        errors = errorHandler( msg );
         return res.status(500).json({
             msg: 'No se pudo actualizar el perfil'
         })
@@ -90,9 +100,9 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
         const { user } = req;
         const profile = await Profile.findOne({ user });
         if ( !profile ) {
-            return res.status(400).json({
-                msg: 'No se pudo calcular la calificación del usuario'
-            });
+            msg = 'No se pudo calcular la califación del usuario';
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         } 
         const ads = await Ad.find({ publisher: profile._id });
         let points_positive = 0;
@@ -106,18 +116,18 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
             score
         });
         if ( !profileUpdated ) {
-            return res.status(400).json({
-                msg: 'No se pudo generar la calificación'
-            });
+            msg = 'No se pudo generar la calificación';
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         res.status(200).json({
             msg: 'Calificación calculada con exito'
         })
     } catch (error) {
         console.log('Controller Calculate Rating Profile Error -->', error);
-        return res.status(500).json({
-            msg: 'No se pudo calcular la calificación del usuario'
-        })
+        msg = 'No se pudo calcular la calificación del usuario';
+        errors = errorHandler( msg );
+        return res.status(500).json({ errors })
     }
 }
 

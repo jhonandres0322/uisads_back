@@ -3,6 +3,12 @@ const Ad = require('../models/ad');
 const Profile = require('../models/profile');
 const Category = require('../models/category');
 
+// * Llamdo de los helpers
+const { errorHandler } = require('../helpers/error_handler');
+
+let msg;
+let errors;
+
 // * Middleware para validar si existe un anuncio por id
 const validateAdExists = async (id) => {
     const ad = await Ad.findById(id);
@@ -15,15 +21,15 @@ const validateAdExists = async (id) => {
 const validateOwnerAd = async ( req = request, res = response, next ) => {
     const profile = await Profile.findOne({ user: req.user._id });
     if ( !profile ) {
-        return res.status(404).json({
-            msg: 'No tiene permisos para realizar la acción'
-        });
+        msg = 'No tiene permisos para realizar la acción';
+        errors = errorHandler( msg );
+        return res.status(404).json({ errors });
     }
     const ad = await Ad.findOne({ publisher: profile._id, _id : req.params.id });
     if ( !ad ) {
-        return res.status(404).json({
-            msg: 'No tiene permisos para realizar la acción'
-        });
+        msg = 'No tiene permisos para realizar la acción';
+        errors = errorHandler( msg );
+        return res.status(404).json({ errors });
     }
     next();
 }

@@ -13,6 +13,9 @@ const User = require('../models/user');
 const { generateOTP } = require('../services/otp');
 const { sendEmail } = require('../services/mail');
 
+let msg;
+let errors;
+
 // * Controlador para iniciar sesión en el servidor
 const login = async (req = request,res = response ) => {
     const { email, password } = req.body;
@@ -20,20 +23,20 @@ const login = async (req = request,res = response ) => {
         // Verificar si el email existe
         const user = await User.findOne({ email });
         if ( !user ) {
-            const msg = `No existe una cuenta con el correo ${email}`;
-            const errors = errorHandler( msg, 'email');
+            msg = `No existe una cuenta con el correo ${email}`;
+            errors = errorHandler( msg, 'email');
             return res.status(400).json({ errors });
         }
         // Verificar si el usuario se encuentra bloqueado
         if ( user.blocked ) {
-            const msg = 'El usuario se encuentra bloqueado';
-            const errors = errorHandler( msg, 'blocked');
+            msg = 'El usuario se encuentra bloqueado';
+            errors = errorHandler( msg, 'blocked');
             return res.status(400).json({ errors });
         }
         // Si el usuario esta activo en la base de datos
         if ( !user.state ) {
-            const msg = 'Usuario no encontrado';
-            const errors = errorHandler( msg, 'state');
+            msg = 'Usuario no encontrado';
+            errors = errorHandler( msg, 'state');
             return res.status(404).json({ errors });
         }
         // Verificar la contraseña
@@ -49,9 +52,9 @@ const login = async (req = request,res = response ) => {
                     blocked: true
                 });
             }
-            const msg = 'Contraseña Incorrecta';
-            const errors = errorHandler( msg, 'password');
-            return res.status(400).json( errors );
+            msg = 'Contraseña Incorrecta';
+            errors = errorHandler( msg, 'password');
+            return res.status(400).json({ errors });
         }
         const token = await generarJWT( user._id );
         const lastEntry = new Date();
@@ -65,9 +68,9 @@ const login = async (req = request,res = response ) => {
             token
         });
     } catch (error) {
-        const msg = 'Error al loguearse';
-        const errors = errorHandler(msg,'server');
-        return res.status(500).json( errors );
+        msg = 'Error al loguearse';
+        errors = errorHandler(msg,'server');
+        return res.status(500).json({ errors });
     }
 }
 
@@ -80,9 +83,9 @@ const registerUser = async (req = request,res = response ) => {
         userCreated.password = createPassword( password );
         const userSaved = await userCreated.save();
         if( !userSaved ) {
-            return res.status(500).json({
-                msg: 'No se pudo guardar el usuario'
-            });
+            msg = 'No se pudo guardar el anuncio';
+            errors = errorHandler( msg );
+            return res.status(500).json({ errors });
         }
         const token = await generarJWT( userSaved._id );
         return res.status(200).json({
@@ -92,6 +95,8 @@ const registerUser = async (req = request,res = response ) => {
         });
     } catch (error) {
         console.log('ERROR CONTROLER REGISTER USER -->', error);
+        msg = 'No se pudo guardar el usuario';
+        errors = errorHandler( msg );
         return res.status(500).json({
             msg: 'No se pudo guardar el usuario'
         });
@@ -106,27 +111,27 @@ const changePassword = async ( req = request, res = response ) => {
         const userPass = await User.findOne( { email: user.email } ).select('password');
         const isPassword = validatePassword( userPass.password, passwordOld ); 
         if ( !isPassword ) {
-            return res.status(400).json({
-                msg: 'La contraseñas no coinciden'
-            });
+            msg = 'La contraseñas no coinciden'
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         const password = createPassword( passwordNew );
         const userUpdated = await User.findByIdAndUpdate( userPass._id, {
             password
         });
         if ( !userUpdated ) {
-            return res.status(400).json({
-                msg: 'No se pudo guardar la nueva contraseña'
-            });
+            msg = 'No se pudo guardar la nueva contraseña';
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         return res.status(200).json({
             msg: 'Contraseña cambiada con exito'
         });
     } catch (error) {
         console.log('ERROR CONTROLLER CHANGE PASSWORD -->', error);
-        return res.status(500).json({
-            msg: 'Problemas para cambiar la contraseña'
-        })
+        msg = 'Problemas para cambiar la contraseña';
+        errors = errorHandler( msg );
+        return res.status(500).json({ msg });
     }
 }
 
@@ -136,36 +141,36 @@ const forgotPassword = async ( req = request, res = response ) => {
         const { email } = req.body;
         const user = await User.findOne({ email });
         if ( !user ) {
-            return res.status(400).json({
-                msg: 'Usuario no encontrado'
-            });
+            msg = 'Usuario no encontrado';
+            errors =  errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         const otp = generateOTP();
         const userUpdated = await User.findByIdAndUpdate( user._id, {
             otp
         });
         if ( !userUpdated ) {
-            return res.status(400).json({
-                msg: 'Problemas para generar el codigo'
-            });
+            msg = 'Problemas para generar el codigo';
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         const sentEmail = await sendEmail({
             email: user.email,
             OTP: otp
         });
         if ( !sentEmail ) {
-            return res.status(500).json({
-                msg: 'No se pudo enviar el mensaje con el codigo'
-            });
+            msg = 'No se pudo enviar el mensaje con el codigo';
+            errors = errorHandler( msg );
+            return res.status(500).json({ errors });
         }
         res.status(200).json({
             msg: 'Mensaje enviado con exito. Por favor revisar el correo electronico'
         });
     } catch (error) {
         console.log('ERROR CONTROLLER FORGOT PASSWORD -->', error);
-        return res.status(500).json({
-            msg: 'No se pudo generar el codigo de verificación'
-        });
+        msg = 'No se pudo generar el codigo de verificación';
+        errors = errorHandler( msg );
+        return res.status(500).json({ errors });
     }
 }
 
@@ -175,9 +180,9 @@ const validateCodeOTP = async ( req = request, res = response ) => {
         const { otp, email } = req.body;
         const user = await User.findOne({otp, email});
         if ( !user ) {
-            return res.status(400).json({
-                msg: 'OTP invalido'
-            });
+            msg = 'OTP Invalido';
+            errors = errorHandler( msg );
+            return res.status(400).json({ errors });
         }
         res.status(200).json({
             msg: 'Codigo valido'
