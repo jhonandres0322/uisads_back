@@ -19,6 +19,10 @@ const schemaProfile = new Schema({
     score: {
         type: Number,
         default: 0
+    },
+    city : {
+        type: Schema.Types.ObjectId,
+        ref: 'City'
     }
 },{
     timestamps: true
