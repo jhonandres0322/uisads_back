@@ -161,9 +161,7 @@ const createAd = async( req = request, res = response ) => {
         if( !adSaved ) {
             msg = 'No se pudo guardar el anuncio';
             errors = errorHandler( msg ); 
-            return res.status(500).json({
-                msg: 'No se pudo guardar el anuncio'
-            });
+            return res.status(500).json({ errors });
         }
         return res.status(200).json({
             msg: 'Se ha guardado el anuncio con exito'
