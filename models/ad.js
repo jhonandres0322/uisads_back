@@ -31,11 +31,7 @@ const schemaAd = new Schema({
     score: {
         type: Number,
         default: 0
-    },
-    reports: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Report'
-    }]
+    }
 },{
     timestamps: true
 });

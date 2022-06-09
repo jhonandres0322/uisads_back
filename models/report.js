@@ -8,6 +8,10 @@ const schemaReport = new Schema({
     },
     description: {
         type: String
+    },
+    ad: {
+        type: Schema.Types.Boolean,
+        ref: 'Ad'
     }
 },{
     timestamps: true
