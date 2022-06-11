@@ -60,7 +60,6 @@ const login = async (req = request,res = response ) => {
         const lastEntry = new Date();
         await User.findByIdAndUpdate( user._id, {
             lastEntry,
-            retry: 0,
             available: true
         });
         res.json({
