@@ -195,11 +195,35 @@ const validateCodeOTP = async ( req = request, res = response ) => {
     }
 }
 
+const loginGoogleFacebook = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER LOGIN GOOGLE FACEBOOK -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const loginGuest = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER LOGIN GUEST  -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
 module.exports = {
     login,
     registerUser,
     changePassword,
     forgotPassword,
-    validateCodeOTP
+    validateCodeOTP,
+    loginGoogleFacebook,
+    loginGuest
 }
 

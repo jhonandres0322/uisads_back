@@ -131,10 +131,57 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
     }
 }
 
+const addAdHistorial = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER ADD AD HISTORIAL -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const getHistorial = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER GET HISTORIAL -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const sendNotifications = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER SEND NOTIFICATIONS -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+} 
+
+const disabledNotifications = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER DISABLED NOTIFICATIONS -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
 
 module.exports = {
     createProfile,
     getProfile,
     updateProfile,
-    calculateRatingProfile
+    calculateRatingProfile,
+    addAdHistorial,
+    getHistorial,
+    sendNotifications,
+    disabledNotifications
 }

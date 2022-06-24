@@ -340,6 +340,16 @@ const searchAds = async ( req = request, res = response ) => {
     }
 } 
 
+const saveFavorite = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER SAVE FAVORITE -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
 
 module.exports = {
     createAd,
@@ -350,5 +360,6 @@ module.exports = {
     getAds,
     manageRating,
     getAdsByCategory,
-    searchAds
+    searchAds,
+    saveFavorite
 }
