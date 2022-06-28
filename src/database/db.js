@@ -5,9 +5,9 @@ class MongoConnection {
     
     constructor() {
         if ( process.env.NODE_ENV === 'development' ) {
-            this.URI = process.env.MONGO_URI_DEV;
+            this.URI = process.env.MONGO_URL_DEV;
         } else {
-            this.URI = process.env.MONGO_URI_PRD;
+            this.URI = process.env.MONGO_URL_PRD;
         }
     }
 

@@ -26,19 +26,6 @@ router.get('/:id',
     getProfile
 );
 
-// * Ruta para crear un perfil
-router.post('/',
-    validateJWT,
-    upload.single('image'),
-    saveImages,
-    isProfileExists,
-    check('name','El nombre es obligatorio').not().isEmpty(),
-    check('cellphone', 'El telefono es obligatorio').not().isEmpty(),
-    check('cellphone','Debe ser un número de telefono valido').isMobilePhone('es-CO'),
-    validateFields,
-    createProfile
-);
-
 // * Ruta para actualizar un perfil
 router.put('/:id',
     validateJWT,

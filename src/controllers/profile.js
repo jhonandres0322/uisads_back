@@ -34,36 +34,6 @@ const getProfile = async ( req = request, res = response ) => {
     }
 }
 
-// * Controlador para crear perfil
-const createProfile = async (req = request, res = response ) => {
-    try {
-        const { name, cellphone } = req.body;
-        const { user } = req;
-        const { image } = req;
-        const newProfile = new Profile({
-            name,
-            cellphone,
-            user: user._id,
-            image
-        });
-        const savedProfile = await newProfile.save();
-        if( !savedProfile ) {
-            msg = 'No se pudo crear el perfil';
-            errors = errorHandler( msg );
-            return res.status(404).json({ errors });
-        }
-        res.status(200).json({
-            msg: 'Perfil creado con exito',
-            profile: savedProfile
-        });
-    } catch (error) {
-        console.log('ERROR CONTROLLER CREATE PROFILE -->', error);
-        msg = 'No se pudo crear el perfil';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors })
-    }
-}
-
 // * Controlador para actualizar el perfil de usuario
 const updateProfile = async ( req = request, res = response ) => {
     try {
@@ -133,7 +103,6 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
 
 
 module.exports = {
-    createProfile,
     getProfile,
     updateProfile,
     calculateRatingProfile
