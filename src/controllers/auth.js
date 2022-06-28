@@ -12,6 +12,7 @@ const User = require('../models/user');
 // * Llamado de servicios
 const { generateOTP } = require('../services/otp');
 const { sendEmail } = require('../services/mail');
+const { createProfile } = require('../helpers/profile');
 
 let msg;
 let errors;
@@ -88,10 +89,17 @@ const registerUser = async (req = request,res = response ) => {
             return res.status(500).json({ errors });
         }
         const token = await generarJWT( userSaved._id );
+        const profileSaved = await createProfile(req, res, userSaved );
+        if( !profileSaved ) {
+            msg = 'No se pudo crear el perfil';
+            errors = errorHandler( msg );
+            return res.status(404).json({ errors });
+        }
         return res.status(200).json({
             msg: 'Usuario Creado con Exito',
             token,
-            userSaved
+            user: userSaved,
+            profile: profileSaved
         });
     } catch (error) {
         console.log('ERROR CONTROLER REGISTER USER -->', error);
