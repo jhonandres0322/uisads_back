@@ -18,6 +18,20 @@ const createCity = async ( req = request, res = response ) => {
     });
 }
 
+
+const getCities = async( req = request, res = response ) => {
+    const cities = await City.find();
+    if( !cities ) {
+        msg = 'No se pudo crear la ciudad';
+        errors = errorHandler( msg );
+        return res.status(400).json({ errors });
+    }
+    return res.status(200).json({
+        cities
+    });
+}
+
 module.exports = {
-    createCity
+    createCity,
+    getCities
 }

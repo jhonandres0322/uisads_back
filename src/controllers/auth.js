@@ -79,6 +79,7 @@ const login = async (req = request,res = response ) => {
 const registerUser = async (req = request,res = response ) => {
     const { email, password } = req.body;
     try {
+        console.log("email controller -->",email);
         const userCreated = new User();
         userCreated.email = email;
         userCreated.password = createPassword( password );
