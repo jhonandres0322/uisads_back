@@ -1,8 +1,8 @@
-// * Llamado de dependencias
+// * Importacion de dependencias
 const { Router } = require("express");
 const { check } = require('express-validator');
 
-// * Llamado de controladores
+// * Importacion de controladores
 const { 
     createAd,
     updateAd,
@@ -14,7 +14,7 @@ const {
     searchAds
 } = require("../controllers/ad");
 
-// * Llamado de middlewares
+// * Importacion de middlewares
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require('../middlewares/validate_jwt');
 const { 
@@ -64,8 +64,8 @@ router.get('/category/:id',
 // * Ruta que crea un anuncio
 router.post('/',
     validateJWT,
-    upload.array('images',5),
-    saveImages,
+    // upload.array('images',5),
+    // saveImages,
     check('title', 'El titulo del anuncio es obligatorio').not().isEmpty(),
     check('description','La descripción es obligatoria').not().isEmpty(),
     validateFields,

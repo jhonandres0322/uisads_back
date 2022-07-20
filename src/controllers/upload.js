@@ -10,18 +10,11 @@ const deleteUpload = async (req = request, res = response) => {
         const { id } = req.params;
         const deleteUpload = await Upload.findByIdAndDelete(id);
         if ( !deleteUpload ) {
-            return res.status(404).json({
-                msg: 'No se pudo eliminar la imagen'
-            });
+            return res.status(404).json({ msg : 'No se pudo calcular la califación del usuario.' });
         }
-        res.status(200).json({
-            msg: 'Imagen eliminada con exito'
-        });
+        res.status(200).json({ msg: 'Imagen eliminada con exito' });
     } catch (error) {
-        console.log('ERROR CONTROLLER DELETE UPLOAD -->', error);
-        return res.status(500).json({
-            msg: 'No se pudo eliminar la imagen'
-        })
+        return res.status(500).json({ msg : 'No se pudo eliminar las imagenes.' });
     }
 }
 

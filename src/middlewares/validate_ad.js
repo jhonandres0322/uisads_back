@@ -21,15 +21,11 @@ const validateAdExists = async (id) => {
 const validateOwnerAd = async ( req = request, res = response, next ) => {
     const profile = await Profile.findOne({ user: req.user._id });
     if ( !profile ) {
-        msg = 'No tiene permisos para realizar la acción';
-        errors = errorHandler( msg );
-        return res.status(404).json({ errors });
+        return res.status(404).json({ errors : errorHandler( 'No tiene permisos para realizar la acción' ) });
     }
     const ad = await Ad.findOne({ publisher: profile._id, _id : req.params.id });
     if ( !ad ) {
-        msg = 'No tiene permisos para realizar la acción';
-        errors = errorHandler( msg );
-        return res.status(404).json({ errors });
+        return res.status(404).json({ errors : errorHandler( 'No tiene permisos para realizar la acción' ) });
     }
     next();
 }
