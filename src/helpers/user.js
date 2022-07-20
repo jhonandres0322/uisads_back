@@ -1,4 +1,4 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const bcryptjs = require('bcryptjs');
 
 const salt = bcryptjs.genSaltSync();

@@ -1,4 +1,4 @@
-// * Llamado del modelo
+// * Importación del modelo
 const Ad = require('../models/ad');
 
 // * Función para generar la paginación en los anuncios

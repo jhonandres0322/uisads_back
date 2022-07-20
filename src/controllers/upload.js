@@ -1,7 +1,7 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { response, request } = require('express');
 
-// * Llamado de los modelos
+// * Importación de los modelos
 const Upload = require('../models/upload');
 
 // * Controlador para eliminar una imagen

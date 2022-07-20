@@ -1,13 +1,7 @@
-// * Llamado de los modelos
+// * Importación de los modelos
 const Ad = require('../models/ad');
 const Profile = require('../models/profile');
 const Category = require('../models/category');
-
-// * Llamdo de los helpers
-const { errorHandler } = require('../helpers/error_handler');
-
-let msg;
-let errors;
 
 // * Middleware para validar si existe un anuncio por id
 const validateAdExists = async (id) => {

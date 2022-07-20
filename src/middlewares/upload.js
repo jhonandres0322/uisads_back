@@ -1,11 +1,11 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { request, response } = require('express');
 const multer = require('multer');
 
-// * Llamado de los modelos
+// * Importación de los modelos
 const Upload = require('../models/upload');
 
-// * Llamado de los helpers
+// * Importación de los helpers
 const { organizeImage } = require('../helpers/uploads');
 
 // * Middleware para generar el storage del multer

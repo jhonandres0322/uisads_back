@@ -1,9 +1,7 @@
-// * Llamado de las depedencias
+// * Importación de las depedencias
 const { request, response } = require('express');
-const { errorHandler } = require("../helpers/error_handler");
 
-
-// * Llamado de los modelos
+// * Importación de los modelos
 const Profile = require('../models/profile')
 
 // * Función para buscar el perfil por el id del usuario

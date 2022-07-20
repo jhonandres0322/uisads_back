@@ -1,4 +1,4 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { validationResult } = require("express-validator");
 
 // * Middleware para validar los campos que sone evaluados con 

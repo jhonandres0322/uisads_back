@@ -1,16 +1,15 @@
-// * Llamado de dependencias
+// * Importación de dependencias
 const { request, response } = require('express');
 
-// * Llamado de helpers
+// * Importación de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
 const { validatePassword, createPassword } = require('../helpers/user');
-const { errorHandler } = require('../helpers/error_handler');
 
-// * Llamado de modelos
+// * Importación de modelos
 const User = require('../models/user');
 const Profile = require('../models/profile');
 
-// * Llamado de servicios
+// * Importación de servicios
 const { generateOTP } = require('../services/otp');
 const { sendEmail } = require('../services/mail');
 const { createProfile } = require('../helpers/profile');
