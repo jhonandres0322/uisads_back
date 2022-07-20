@@ -17,9 +17,7 @@ const isEmailExists = async ( email = '' ) => {
 const isUserExists = async ( req = request, res = response, next ) => {
     const userExist = await User.findById(req.user.id);
     if ( !userExist ) {
-        res.status(401).json({
-            msg: 'No se pudo crear el perfil. Usuario no encontrado'
-        });
+        res.status(401).json({ msg: 'No se pudo crear el perfil. Usuario no encontrado' });
     }
     next();
 }

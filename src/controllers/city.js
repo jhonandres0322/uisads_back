@@ -9,29 +9,43 @@ const createCity = async ( req = request, res = response ) => {
     });
     const citySaved = await newCity.save();
     if( !citySaved ) {
-        msg = 'No se pudo crear la ciudad';
-        errors = errorHandler( msg );
-        return res.status(400).json({ errors });
+        return res.status(400).json({ msg : 'No se pudo crear la ciudad' });
     }
-    return res.status(200).json({
-        msg : 'Ciudad creada con exito'
-    });
+    return res.status(200).json({ msg : 'Ciudad creada con exito' });
 }
 
 
 const getCities = async( req = request, res = response ) => {
-    const cities = await City.find();
-    if( !cities ) {
-        msg = 'No se pudo crear la ciudad';
-        errors = errorHandler( msg );
-        return res.status(400).json({ errors });
+    try {
+        const cities = await City.find();
+        if( !cities ) {
+            return res.status(400).json({ msg : 'No se encontraron las ciudades' });
+        }
+        return res.status(200).json({
+            cities
+        });        
+    } catch (error) {
+        return res.status(400).json({ msg : 'No se encontraron las ciudades' });
     }
-    return res.status(200).json({
-        cities
-    });
+}
+
+const getCityById = async ( req = request, res = response ) => {
+    try {
+        const { id } = req.params;
+        const city = await City.findById( id );
+        if( !city ) {
+            return res.status(400).json({ msg : 'No se encontro la ciudad' });
+        }
+        return res.status(200).json({
+            city
+        });   
+    } catch (error) {
+        return res.status(400).json({ msg : 'No se encontro la ciudad' });
+    }
 }
 
 module.exports = {
     createCity,
-    getCities
+    getCities,
+    getCityById
 }

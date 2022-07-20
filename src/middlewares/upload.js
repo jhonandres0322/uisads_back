@@ -40,7 +40,7 @@ const saveImages = async (req = request, res = response, next) => {
                     next();
                 } else {
                     return res.status(400).json({
-                        msg: 'El anuncio debe tener mas de una imagen'
+                        msg: 'El anuncio debe tener una imagen o más'
                     });
                 }
                 break;

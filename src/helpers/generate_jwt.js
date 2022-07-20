@@ -9,7 +9,6 @@ const generarJWT = ( uid = '' ) => {
             expiresIn: process.env.JWT_EXPIRES_TIME
         }, (error, token) => {
             if ( error ) {
-                console.log('ERROR GENERATE JWT -->', error);
                 reject('No se pudo generar el token');
             } else {
                 resolve( token );

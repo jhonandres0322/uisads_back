@@ -16,22 +16,21 @@ const searchProfile =  async ( idUser ) => {
 }
 
 const createProfile = async ( req = request, res = response, user ) => {
-try {
-        const { name, cellphone } = req.body;
-        const { image } = req;
+    try {
+        const { name, cellphone, city } = req.body;
         const newProfile = new Profile({
             name,
             cellphone,
             user: user._id,
-            image
+            city
         });
         const savedProfile = await newProfile.save();
+        if ( !savedProfile ) {
+            return res.status(404).json({ msg : 'No se pudo crear el perfil' });
+        }
         return savedProfile;
     } catch (error) {
-        console.log('ERROR CONTROLLER CREATE PROFILE -->', error);
-        msg = 'No se pudo crear el perfil';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors })
+        return res.status(500).json({ msg : 'No se pudo crear el perfil' })
     }
 }
 

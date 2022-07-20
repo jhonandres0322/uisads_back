@@ -5,15 +5,12 @@ const { request, response } = require('express');
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
 const { makePagination, updatePointsAd } = require('../helpers/ads');
-const { errorHandler } = require('../helpers/error_handler');
 
 // * Llamado de los modelos
 const Ad = require('../models/ad');
 const Profile = require('../models/profile');
 const Vote = require('../models/vote');
 
-let msg;
-let errors;
 
 // * Controlador para mostrar todos los anuncios
 const getAds = async( req = request, res = response ) => {
@@ -28,17 +25,13 @@ const getAds = async( req = request, res = response ) => {
             direction: sortDirection
         };
         const ads = await makePagination(page, sort, {} , filter );
+        const totalRows = ads.length;
         if ( !ads ) {
-            msg = 'No se encontraron anuncios';
-            errors = errorHandler(msg);
-            return res.status(404).json({ errors });
+            return res.status(404).json({ msg : 'No se encontraron anuncios' });
         }
-        res.status(200).json({ ads });
+        res.status(200).json({ totalRows, ads });
     } catch (error ) {
-        console.log(` ERROR CONTROLER GET ADS --> ${error} `)
-        msg = 'No se pueden visualizar los anuncios';
-        errors = errorHandler(msg);
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg : 'No se pueden visualizar los anuncios' });
     }
 }
 
@@ -62,9 +55,7 @@ const getAdsByCategory = async ( req = request, res = response ) => {
         };
         const ads = await makePagination(page, sort, condition, filter );
         if ( !ads ) {
-            msg = 'No se encontraron anuncios';
-            errors = errorHandler(msg);
-            return res.status(404).json({ errors });
+            return res.status(404).json({  msg :  'No se encontraron anuncios' });
         }
         const totalRow = ads.length;
         res.status(200).json({
@@ -72,10 +63,7 @@ const getAdsByCategory = async ( req = request, res = response ) => {
             ads 
         });
     } catch (error) {
-        console.log(` ERROR CONTROLLER GET ADS CATEGORY --> ${error} `)
-        msg = 'No se pueden visualizar los anuncios';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors })
+        return res.status(500).json({  msg :  'No se pueden visualizar los anuncios' })
     }
 }
 
@@ -98,9 +86,7 @@ const getAdsByPublisher = async ( req = request, res = response) => {
         };
         const ads = await makePagination(page, sort, condition, filter );
         if ( !ads ) {
-            msg = 'No se encontraron anuncios';
-            errors = errorHandler(msg);
-            return res.status(404).json({ errors });
+            return res.status(404).json({  msg :  'No se encontraron anuncios' });
         }
         const totalRow = ads.length;
         res.status(200).json({
@@ -108,10 +94,7 @@ const getAdsByPublisher = async ( req = request, res = response) => {
             ads 
         });
     } catch (error) {
-        console.log(` ERROR CONTROLLER GET ADS PUBLISHER --> ${error} `)
-        msg = 'No se pueden visualizar los anuncios';
-        errors = errorHandler(msg);
-        return res.status(500).json({ errors })
+        return res.status(500).json({ msg : 'No se encontraron anuncios' })
     }
 }
 
@@ -123,18 +106,13 @@ const getAd = async( req = request, res = response ) => {
                             .populate('images')
                             .populate('publisher');
         if ( !ad ) {
-            msg = 'No se encontro el anuncio';
-            errors = errorHandler( msg );
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No se encontró el anuncio' });
         }
         res.status(200).json({
             ad
         });
     } catch (error) {
-        console.log( 'ERROR CONTROLLER GET AD -->', error);
-        msg = 'No se puede visualizar el anuncio';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg :  'No se puede encontro el anuncio'  });
     }
 }
 
@@ -146,9 +124,7 @@ const createAd = async( req = request, res = response ) => {
     try {
         const profile  = await searchProfile( user._id );
         if ( !profile ) {
-            msg = 'No se encontro el perfil de usuario';
-            errors = errorHandler( msg );
-            return res.status(404).json({ errors });
+            return res.status(404).json({  msg :  'No se encontro el perfil de usuario' });
         }
         const adNew = new Ad({
             title,
@@ -159,20 +135,13 @@ const createAd = async( req = request, res = response ) => {
         });
         const adSaved = await adNew.save();
         if( !adSaved ) {
-            msg = 'No se pudo guardar el anuncio';
-            errors = errorHandler( msg ); 
-            return res.status(500).json({ errors });
+            return res.status(500).json({  msg :  'No se pudo guardar el anuncio' });
         }
         return res.status(200).json({
             msg: 'Se ha guardado el anuncio con exito'
         });
     } catch (error) {
-        console.log( 'ERROR CONTROLLER CREATE AD -->', error);
-        msg = 'No se pudo guardar el anuncio';
-        errors = errorHandler( msg );
-        return res.status(500).json({
-            msg: 'No se pudo guardar el anuncio'
-        });
+        return res.status(500).json({  msg :  'No se pudo guardar el anuncio' });
     }
 }
 
@@ -187,18 +156,13 @@ const updateAd = async( req = request, res = response ) => {
             visible
         });
         if ( !adUpdate ) {
-            msg = 'No se pudo actualizar el anuncio';
-            errors = errorHandler( msg );
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No se pudo actualizar el anuncio' });
         }
         res.status(200).json({
             msg: 'El anuncio se actualizo con exito'
         });
     } catch (error) {
-        console.log( 'ERROR CONTROLER UPDATE AD -->', error);
-        msg = 'No se pudo actualizar el anuncio';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg :  'No se pudo actualizar el anuncio'  });
     }
 }
 
@@ -208,24 +172,15 @@ const deleteAd = async( req = request, res = response ) => {
         const { id } = req.params;
         const adsDelete = await Ad.findByIdAndUpdate(id, { state: false });
         if( !adsDelete.state ) {
-            msg = 'El anuncio ya se ha borrado';
-            errors = errorHandler( msg );
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'El anuncio ya se ha borrado' });
         }
         const uploads = adsDelete.images;
         if ( !deleteUploads( uploads ) ) {
-            msg = 'No se pudo eliminar el anuncio';
-            errors = errorHandler( msg );
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No se pudo eliminar el anuncio' });
         }
-        res.status(200).json({
-            msg: 'Anuncio eliminado con exito'
-        });
+        res.status(200).json({ msg: 'Anuncio eliminado con exito' });
     } catch (error) {
-        console.log( 'ERROR CONTROLLER DELETE AD -->', error);
-        msg = 'No se pudo eliminar el anuncio';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg :  'No se pudo eliminar el anuncio' });
     }
 }
 
@@ -244,21 +199,15 @@ const manageRating = async ( req = request, res = response ) => {
         const options = ['like', 'dislike'];
         const isOptionValidate = options.find( opt => opt == choice )
         if ( !isOptionValidate ) {
-            msg = 'No es escogio un opción valida';
-            errors = errorHandler( msg );
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No es escogio un opción valida' });
         }
         const profile = await Profile.findOne({ user: user._id });
         if ( !profile ) {
-            msg = '';
-            errors = errorHandler( msg )
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No se encontro un perfil valido' });
         }
         const ad = await Ad.findById(id);
         if ( !ad ) {
-            msg = '';
-            errors = errorHandler( msg )
-            return res.status(400).json({ errors });
+            return res.status(400).json({  msg :  'No se encontro el anuncio' });
         } else {
             const vote = await Vote.findOne({
                 voter: profile._id,
@@ -267,18 +216,14 @@ const manageRating = async ( req = request, res = response ) => {
             let updatePoints;
             if ( vote ) {
                 if ( vote.type == choice ) {
-                    msg = '';
-                    errors = errorHandler( msg )
-                    return res.status(400).json({ errors })
+                    return res.status(400).json({ msg: 'No se pudo reaccionar al anuncio' });
                 } else {
                     const voteUpdated = await Vote.findByIdAndUpdate(
                         vote._id,
                         { type: choice }
                     );
                     if ( !voteUpdated ) {
-                        msg = '';
-                        errors = errorHandler( msg )
-                        return res.status(400).json({ errors });
+                        return res.status(400).json({ msg : 'No se pudo reaccionar al anuncio' });
                     }
                     updatePoints = await updatePointsAd(choice, ad, 'update' );
                 }
@@ -290,33 +235,27 @@ const manageRating = async ( req = request, res = response ) => {
                 });
                 const votedSaved = await newVote.save();
                 if ( !votedSaved ) {
-                    msg = '';
-                    errors = errorHandler( msg )
-                    return res.status(400).json({ errors });
+                    return res.status(400).json({ msg : 'No se pudo reaccionar el anuncio' });
                 }
                 updatePoints = await updatePointsAd(choice, ad, 'new' );
             }
             if ( !updatePoints ) {
-                msg = '';
-                errors = errorHandler( msg )
-                return res.status(400).json({ errors })
+                return res.status(400).json({ msg : 'No se pudo reaccionar al anuncio' })
             }
             res.status(200).json({
                 msg: 'Se ha calificado con exito'
             });
         }
     } catch (error) {
-        console.log( 'ERROR CONTROLLER MANAGE RATING -->', error);
-        msg = '';
-        errors = errorHandler( msg )
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg :  'No se pudo reaccionar al anuncio' });
     }
 }
 
 // * Controlador para buscar anuncios
 const searchAds = async ( req = request, res = response ) => {
     try {
-        const { query } = req.params;
+        // type --> profile o main RF #25
+        const { query, } = req.params;
         const ads = await Ad.find({
             $or: [
                 { title : new RegExp(query, 'i') }, 
@@ -324,19 +263,14 @@ const searchAds = async ( req = request, res = response ) => {
             ]
         });
         if ( !ads ) {
-            msg = 'No se encontraron resultados';
-            errors = errorHandler( msg );
-            return res.status(404).json({ errors });
+            return res.status(404).json({  msg :  'No se encontraron resultados' });
         }
         res.status(200).json({
             totalRows: ads.length,
             ads
         });
     } catch (error) {
-        console.log('CONTROLLER SEARCH ADS -->', error);
-        msg = 'No se encontraron anuncios';
-        errors = errorHandler( msg );
-        return res.status(500).json({ errors });
+        return res.status(500).json({  msg :  'No se encontraron anuncios' });
     }
 } 
 

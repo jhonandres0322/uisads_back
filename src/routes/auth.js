@@ -1,8 +1,8 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { Router } = require("express");
 const { check } = require('express-validator');
 
-// * Llamado de los controladores
+// * Importación de los controladores
 const {
     login,
     registerUser,
@@ -11,7 +11,7 @@ const {
     validateCodeOTP
 } = require('../controllers/auth');
 
-// * Llamado de los middlewares
+// * Importación de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
 const { isEmailExists } = require("../middlewares/validate_user");
 const { validateJWT } = require('../middlewares/validate_jwt');
