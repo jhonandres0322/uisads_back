@@ -1,4 +1,4 @@
-// * LLamado de las dependencias
+// * Importación de las dependencias
 const jwt = require('jsonwebtoken');
 
 // * Función para generar el token de usuario

@@ -1,7 +1,7 @@
-// * Llamado de las dependencias;
+// * Importación de las dependencias;
 const fs = require('fs');
 
-//* Llamado de los modelos
+//* Importación de los modelos
 const Upload = require('../models/upload');
 
 // * Función para eliminar los uplods de la base de datos

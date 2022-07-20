@@ -1,6 +1,5 @@
 const City = require('../models/city');
 const { request, response } = require('express');
-const { errorHandler } = require("../helpers/error_handler");
 
 const createCity = async ( req = request, res = response ) => {
     const { name } = req.body;

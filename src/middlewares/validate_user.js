@@ -1,7 +1,7 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { request, response } = require('express');
 
-// * Llamado de los modelos
+// * Importación de los modelos
 const User = require('../models/user');
 const Profile = require('../models/profile');
 

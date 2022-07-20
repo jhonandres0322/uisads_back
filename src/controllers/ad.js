@@ -1,12 +1,12 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { request, response } = require('express');
 
-// * Llamado de los helpers
+// * Importación de los helpers
 const { deleteUploads } = require('../helpers/uploads');
 const { searchProfile } = require('../helpers/profile');
 const { makePagination, updatePointsAd } = require('../helpers/ads');
 
-// * Llamado de los modelos
+// * Importación de los modelos
 const Ad = require('../models/ad');
 const Profile = require('../models/profile');
 const Vote = require('../models/vote');

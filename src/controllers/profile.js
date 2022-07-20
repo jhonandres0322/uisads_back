@@ -1,15 +1,11 @@
-// * Llamado de las dependencias
+// * Importación de las dependencias
 const { request, response } = require("express");
 
-// * Llamado de los modelos
+// * Importación de los modelos
 const Profile = require('../models/profile');
 const Ad = require('../models/ad');
 const User = require('../models/user');
-const { errorHandler } = require("../helpers/error_handler");
 const { searchProfile } = require('../helpers/profile');
-
-let msg;
-let errors;
 
 // * Controlador para ver el perfil
 const getProfile = async ( req = request, res = response ) => {
