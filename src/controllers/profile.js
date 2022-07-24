@@ -31,11 +31,11 @@ const getProfile = async ( req = request, res = response ) => {
 const updateProfile = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
-        const { name, cellphone, email , description } = req.body;
+        const { name, cellphone, email , description, city } = req.body;
         const { user } = req;
         const { image } = req;
         const updatedProfile = await Profile.findByIdAndUpdate( id, {
-            name, cellphone, description, user : user._id, image 
+            name, cellphone, description, user : user._id, image , city
         });
         const updatedUser = await User.findOneAndUpdate(user,{
             email

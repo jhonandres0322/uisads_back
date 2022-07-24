@@ -31,6 +31,7 @@ const convertFileToBase64 = ( path ) => {
     const buffer = fs.readFileSync( path );
     let bufferStr = JSON.stringify( buffer );
     console.log('type -->', typeof bufferStr);
+    console.log(' length base64 --> ', bufferStr.length );
     return bufferStr ;
 }
 

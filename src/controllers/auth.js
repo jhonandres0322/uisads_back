@@ -45,7 +45,7 @@ const login = async (req = request,res = response ) => {
                     blocked: true
                 });
             }
-            return res.status(400).json({ msg : 'Contraseña Incorrecta' });
+            return res.status(400).json({ msg : 'Contraseña Incorrecta', error: true });
         }
         const token = await generarJWT( user._id );
         const lastEntry = new Date();
@@ -60,7 +60,8 @@ const login = async (req = request,res = response ) => {
             msg: 'Inicio de sesión correcto',
             user,
             token,
-            profile
+            profile,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({ msg : 'Error al loguearse' });
@@ -87,7 +88,8 @@ const registerUser = async (req = request,res = response ) => {
             msg: 'Usuario Creado con Exito',
             token,
             user: userSaved,
-            profile: profileSaved
+            profile: profileSaved,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({ msg : 'No se pudo crear el perfil' });

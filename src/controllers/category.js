@@ -12,7 +12,6 @@ const getCategories = async ( req = request, res = response ) => {
             return res.status(400).json({ msg : 'No se encontraron las categorias' });
         }
         res.status(200).json({
-            totalRows: categories.length,
             categories
         })
     } catch (error) {
