@@ -1,6 +1,3 @@
-// * Importación de las dependencias;
-const fs = require('fs');
-
 //* Importación de los modelos
 const Upload = require('../models/upload');
 
@@ -18,25 +15,16 @@ const deleteUploads = async ( listUploads = [] ) => {
 // * Función para organizar las imagenes para guardarlas en la base de datos
 const organizeImage = ( file ) => {
     console.log( 'file -->', file );
-    const content = convertFileToBase64( file.path );
-    const name = file.originalname;
-    const type = file.mimetype;
+    const content = file.content;
+    const name = file.name;
+    const type = file.type;
     return {
-        content,name,type
+        content, name, type
     }
 }
 
-// * Función para convertir la imagen a base64
-const convertFileToBase64 = ( path ) => {
-    const buffer = fs.readFileSync( path );
-    let bufferStr = JSON.stringify( buffer );
-    console.log('type -->', typeof bufferStr);
-    console.log(' length base64 --> ', bufferStr.length );
-    return bufferStr ;
-}
 
 module.exports = {
     deleteUploads,
     organizeImage,
-    convertFileToBase64
 }

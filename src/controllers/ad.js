@@ -118,9 +118,10 @@ const getAd = async( req = request, res = response ) => {
 
 // * Controlador para crear un anuncio
 const createAd = async( req = request, res = response ) => {
-    const { title, description, visible } = req.body;
-    const { user } = req;
-    const { images } = req;
+    const { title, description, visible, category } = req.body;
+    console.log('category --> ', category);
+    const { user, images } = req;
+    console.log('entrando al controlador');
     try {
         const profile  = await searchProfile( user._id );
         if ( !profile ) {
@@ -131,7 +132,8 @@ const createAd = async( req = request, res = response ) => {
             description,
             visible,
             publisher: profile._id,
-            images
+            images,
+            category
         });
         const adSaved = await adNew.save();
         if( !adSaved ) {
@@ -141,7 +143,7 @@ const createAd = async( req = request, res = response ) => {
             msg: 'Se ha guardado el anuncio con exito'
         });
     } catch (error) {
-        return res.status(500).json({  msg :  'No se pudo guardar el anuncio' });
+        return res.status(500).json({  msg :  `No se pudo guardar el anuncio --> ${error}` });
     }
 }
 
