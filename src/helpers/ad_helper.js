@@ -1,5 +1,5 @@
 // * Importación del modelo
-const Ad = require('../models/ad');
+const Ad = require('../models/ad_model');
 
 // * Función para generar la paginación en los anuncios
 // * Tambien sirve para filtrar los anuncios y buscar por cierta condición

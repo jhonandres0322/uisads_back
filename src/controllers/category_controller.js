@@ -2,7 +2,7 @@
 const { request, response } = require('express');
 
 // * Importación de los modelos
-const Category = require('../models/category');
+const Category = require('../models/category_model');
 
 // * Controlador para mostrar todas las categorias
 const getCategories = async ( req = request, res = response ) => {

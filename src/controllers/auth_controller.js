@@ -3,16 +3,16 @@ const { request, response } = require('express');
 
 // * Importación de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
-const { validatePassword, createPassword } = require('../helpers/user');
+const { validatePassword, createPassword } = require('../helpers/user_helper');
 
 // * Importación de modelos
-const User = require('../models/user');
-const Profile = require('../models/profile');
+const User = require('../models/user_model');
+const Profile = require('../models/profile_model');
 
 // * Importación de servicios
-const { generateOTP } = require('../services/otp');
-const { sendEmail } = require('../services/mail');
-const { createProfile } = require('../helpers/profile');
+const { generateOTP } = require('../services/otp_service');
+const { sendEmail } = require('../services/mail_service');
+const { createProfile } = require('../helpers/profile_helper');
 
 
 // * Controlador para iniciar sesión en el servidor

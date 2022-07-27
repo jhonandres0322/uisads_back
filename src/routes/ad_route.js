@@ -12,7 +12,7 @@ const {
     getAdsByPublisher,
     getAds,
     searchAds
-} = require("../controllers/ad");
+} = require("../controllers/ad_controller");
 
 // * Importacion de middlewares
 const { validateFields } = require("../middlewares/validate_fields");
@@ -22,7 +22,7 @@ const {
     validateOwnerAd,
     validateCategoryExists
 } = require('../middlewares/validate_ad');
-const { saveImages, upload } = require('../middlewares/upload');
+const { saveImages, upload } = require('../middlewares/upload_middleware');
 const { validateExistsProfile } = require("../middlewares/validate_user");
 
 const router = Router();

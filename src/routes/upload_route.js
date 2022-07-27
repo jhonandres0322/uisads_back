@@ -8,7 +8,7 @@ const { validateJWT } = require('../middlewares/validate_jwt');
 const { isProfileExists } = require('../middlewares/validate_user');
 
 //* Llamado de los controladores
-const { deleteUpload } = require('../controllers/upload');
+const { deleteUpload } = require('../controllers/upload_controller');
 
 const router = Router();
 

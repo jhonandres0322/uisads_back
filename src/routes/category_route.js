@@ -2,7 +2,7 @@
 const  { Router } = require('express');
 const { check } = require('express-validator');
 // * Llamado de los controladores
-const { createCategory, getCategories } = require('../controllers/category');
+const { createCategory, getCategories } = require('../controllers/category_controller');
 
 const router = Router();
 

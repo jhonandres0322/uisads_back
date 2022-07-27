@@ -2,14 +2,14 @@
 const { request, response } = require('express');
 
 // * Importación de los helpers
-const { deleteUploads } = require('../helpers/uploads');
-const { searchProfile } = require('../helpers/profile');
-const { makePagination, updatePointsAd } = require('../helpers/ads');
+const { deleteUploads } = require('../helpers/upload_helper');
+const { searchProfile } = require('../helpers/profile_helper');
+const { makePagination, updatePointsAd } = require('../helpers/ad_helper');
 
 // * Importación de los modelos
-const Ad = require('../models/ad');
-const Profile = require('../models/profile');
-const Vote = require('../models/vote');
+const Ad = require('../models/ad_model');
+const Profile = require('../models/profile_model');
+const Vote = require('../models/vote_model');
 
 
 // * Controlador para mostrar todos los anuncios

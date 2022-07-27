@@ -3,10 +3,10 @@ const { request, response } = require('express');
 const multer = require('multer');
 
 // * Importación de los modelos
-const Upload = require('../models/upload');
+const Upload = require('../models/upload_model');
 
 // * Importación de los helpers
-const { organizeImage } = require('../helpers/uploads');
+const { organizeImage } = require('../helpers/upload_helper');
 
 // * Middleware para generar el storage del multer
 const storage = multer.diskStorage({

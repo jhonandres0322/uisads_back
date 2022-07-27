@@ -2,10 +2,10 @@
 const { request, response } = require("express");
 
 // * Importación de los modelos
-const Profile = require('../models/profile');
-const Ad = require('../models/ad');
-const User = require('../models/user');
-const { searchProfile } = require('../helpers/profile');
+const Profile = require('../models/profile_model');
+const Ad = require('../models/ad_model');
+const User = require('../models/user_model');
+const { searchProfile } = require('../helpers/profile_helper');
 
 // * Controlador para ver el perfil
 const getProfile = async ( req = request, res = response ) => {

@@ -1,5 +1,5 @@
 //* Importación de los modelos
-const Upload = require('../models/upload');
+const Upload = require('../models/upload_model');
 
 // * Función para eliminar los uplods de la base de datos
 const deleteUploads = async ( listUploads = [] ) => {
