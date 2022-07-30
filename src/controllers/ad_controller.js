@@ -119,9 +119,7 @@ const getAd = async( req = request, res = response ) => {
 // * Controlador para crear un anuncio
 const createAd = async( req = request, res = response ) => {
     const { title, description, visible, category } = req.body;
-    console.log('category --> ', category);
     const { user, images } = req;
-    console.log('entrando al controlador');
     try {
         const profile  = await searchProfile( user._id );
         if ( !profile ) {
@@ -257,6 +255,10 @@ const manageRating = async ( req = request, res = response ) => {
 const searchAds = async ( req = request, res = response ) => {
     try {
         // type --> profile o main RF #25
+        // Filtros --> Fecha: 24 horas, 7 dias, Un mes, Sin Limite 
+        // Filtros --> Categorias: 
+        // Ordenamiento --> Fecha de Publicación, Mas votados ó Relevancia
+        // Busqueda --> query
         const { query, } = req.params;
         const ads = await Ad.find({
             $or: [

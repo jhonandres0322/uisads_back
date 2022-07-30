@@ -1,26 +1,11 @@
 // * Importación de las dependencias
 const { request, response } = require('express');
-const multer = require('multer');
 
 // * Importación de los modelos
 const Upload = require('../models/upload_model');
-
+const Profile = require('../models/profile_model');
 // * Importación de los helpers
 const { organizeImage } = require('../helpers/upload_helper');
-
-// * Middleware para generar el storage del multer
-const storage = multer.diskStorage({
-    destination: ( req, file, cb ) => {
-        cb( null, process.env.PATH_UPLOAD );
-    },
-    filename: ( req, file, cb ) => {
-        const filename = file.originalname.toLowerCase().split(' ').join('-');
-        cb( null, filename );
-    }
-})
-
-// * Middleware para generar la instancia de multer en el servidor
-const upload = multer({ storage });
 
 // * Middleware para guardar las imagenes en la base de datos
 const saveImages = async (req = request, res = response, next) => {
@@ -30,7 +15,6 @@ const saveImages = async (req = request, res = response, next) => {
         if ( images && images.length > 0 ) {
             let idsUploads = [];
             for ( let i = 0; i < images.length; i++ ) {
-                console.log('index -->', i);
                 const uploadSave = organizeImage( images[i] );
                 const newUpload = new Upload( uploadSave );
                 const uploadCreated = await newUpload.save();
@@ -44,14 +28,42 @@ const saveImages = async (req = request, res = response, next) => {
             });
         }
     } catch (error) {
-        console.log("Error Middleware saveImages -->", error);
         return res.status(401).json({
             msg: 'No existe imagenes para el anuncio'
         });
     }
 }
 
+const saveImageProfile = async (req = request, res = response, next) => {
+    const body =  req.body;
+    const image = JSON.parse( body.image );
+    try {
+        if ( image.content.length > 0 ) {
+            const previousImageProfile = await Profile.findOne({
+                user: req.user._id
+            })
+            if( !previousImageProfile ) {
+                return res.status(404).json({
+                    msg: 'No se pudo actualizar el perfil'
+                });
+            }
+            const idUpload = previousImageProfile.image;
+            await Upload.findByIdAndDelete( idUpload );
+            const uploadSave = organizeImage( image );
+            const newUpload = new Upload( uploadSave );
+            const uploadCreated = await newUpload.save();
+            idImage = uploadCreated._id
+            req.image = idImage;
+        }
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            msg: 'No se pudo actualizar el perfil'
+        });
+    }
+}
+
 module.exports = {
     saveImages,
-    upload
+    saveImageProfile
 };

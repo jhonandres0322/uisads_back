@@ -14,7 +14,6 @@ const deleteUploads = async ( listUploads = [] ) => {
 
 // * Función para organizar las imagenes para guardarlas en la base de datos
 const organizeImage = ( file ) => {
-    console.log( 'file -->', file );
     const content = file.content;
     const name = file.name;
     const type = file.type;

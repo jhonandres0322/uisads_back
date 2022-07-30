@@ -55,12 +55,14 @@ const login = async (req = request,res = response ) => {
             retry: 0,
             blocked : false
         });
-        const profile = await Profile.findOne({user: user._id});
+        const profile = await Profile.findOne({user: user._id}).populate('image');
+        const userEmail = await User.findById(user).select('email');
         res.json({
             msg: 'Inicio de sesión correcto',
             user,
             token,
             profile,
+            email: userEmail,
             error: false
         });
     } catch (error) {
