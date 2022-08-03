@@ -11,6 +11,10 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     }],
+    main_page: {
+        type: Schema.Types.ObjectId,
+        ref: 'Upload'
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category'
@@ -34,6 +38,12 @@ const schemaAd = new Schema({
     }
 },{
     timestamps: true
+});
+
+
+schemaAd.pre("save", function(next) {
+    this.main_page = this.images[0];
+    next();
 });
 
 module.exports = model('Ad', schemaAd);

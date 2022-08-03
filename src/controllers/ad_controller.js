@@ -4,7 +4,7 @@ const { request, response } = require('express');
 // * Importación de los helpers
 const { deleteUploads } = require('../helpers/upload_helper');
 const { searchProfile } = require('../helpers/profile_helper');
-const { makePagination, updatePointsAd } = require('../helpers/ad_helper');
+const { makePagination, updatePointsAd, createDateFilter } = require('../helpers/ad_helper');
 
 // * Importación de los modelos
 const Ad = require('../models/ad_model');
@@ -15,23 +15,27 @@ const Vote = require('../models/vote_model');
 // * Controlador para mostrar todos los anuncios
 const getAds = async( req = request, res = response ) => {
     try {
-        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const { pageValue } = req.body;
         const page = {
             number: pageValue,
-            size: pageSize
+            size: process.env.PAGE_SIZE
         };
-        const sort = {
-            value : sortValue,
-            direction: sortDirection
-        };
-        const ads = await makePagination(page, sort, {} , filter );
+        const ads = await Ad.find({
+            state: true,
+            visible: true,
+        })
+        .sort('-createdAt')
+        .select(' title main_page createdAt category')
+        .populate('main_page')
+        .skip(( page.number - 1 ) * page.size )
+        .limit( page.size );
         const totalRows = ads.length;
         if ( !ads ) {
             return res.status(404).json({ msg : 'No se encontraron anuncios' });
         }
         res.status(200).json({ totalRows, ads });
     } catch (error ) {
-        return res.status(500).json({  msg : 'No se pueden visualizar los anuncios' });
+        return res.status(500).json({  msg : `No se pueden visualizar los anuncios ${error}` });
     }
 }
 
@@ -40,30 +44,31 @@ const getAds = async( req = request, res = response ) => {
 const getAdsByCategory = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
-        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const { pageValue } = req.body;
         const page = {
             number: pageValue,
-            size: pageSize
+            size: process.env.PAGE_SIZE
         };
-        const sort = {
-            value : sortValue,
-            direction: sortDirection
-        };
-        const condition = {
-            key : 'category',
-            value : id
-        };
-        const ads = await makePagination(page, sort, condition, filter );
+        const ads = await Ad.find({
+            state: true,
+            visible: true,
+            category: id
+        })
+        .sort('-createdAt')
+        .select(' title main_page createdAt category')
+        .populate('main_page')
+        .skip(( page.number - 1 ) * page.size )
+        .limit( page.size );
         if ( !ads ) {
-            return res.status(404).json({  msg :  'No se encontraron anuncios' });
+            return res.status(404).json({ msg : 'No se encontraron anuncios' });
         }
-        const totalRow = ads.length;
+        const totalRows = ads.length;
         res.status(200).json({
-            totalRow,
+            totalRows,
             ads 
         });
     } catch (error) {
-        return res.status(500).json({  msg :  'No se pueden visualizar los anuncios' })
+        return res.status(500).json({  msg : `No se pueden visualizar los anuncios ${error}` })
     }
 }
 
@@ -71,26 +76,24 @@ const getAdsByCategory = async ( req = request, res = response ) => {
 const getAdsByPublisher = async ( req = request, res = response) => {
     try {
         const { id } = req.params;
-        const { pageValue, sortValue, sortDirection, filter, pageSize } = req.body;
+        const { pageValue } = req.body;
         const page = {
             number: pageValue,
-            size: pageSize
+            size: process.env.PAGE_SIZE
         };
-        const sort = {
-            value : sortValue,
-            direction: sortDirection
-        };
-        const condition = {
-            key : 'publisher',
-            value : id
-        };
-        const ads = await makePagination(page, sort, condition, filter );
-        if ( !ads ) {
-            return res.status(404).json({  msg :  'No se encontraron anuncios' });
-        }
-        const totalRow = ads.length;
+        const ads = await Ad.find({
+            state: true,
+            visible: true,
+            publisher: id
+        })
+        .sort('-createdAt')
+        .select(' title main_page createdAt category')
+        .populate('main_page')
+        .skip(( page.number - 1 ) * page.size )
+        .limit( page.size );        
+        const totalRows = ads.length;
         res.status(200).json({
-            totalRow,
+            totalRows,
             ads 
         });
     } catch (error) {
@@ -254,27 +257,52 @@ const manageRating = async ( req = request, res = response ) => {
 // * Controlador para buscar anuncios
 const searchAds = async ( req = request, res = response ) => {
     try {
-        // type --> profile o main RF #25
-        // Filtros --> Fecha: 24 horas, 7 dias, Un mes, Sin Limite 
-        // Filtros --> Categorias: 
-        // Ordenamiento --> Fecha de Publicación, Mas votados ó Relevancia
-        // Busqueda --> query
-        const { query, } = req.params;
+        const { query } = req.params;
+        const { publisher, time, category, order } = req.body;
+        let orderAd = '';
+        if( order ) {
+            order.value == 'asc' ? orderAd = '+' : orderAd = '-'; 
+            order.type == 'date' ? orderAd += 'createdAt' : orderAd += 'score';
+        }
+        let valueTime = '';
+        if( time ) {
+            valueTime = createDateFilter( time );
+        }
         const ads = await Ad.find({
-            $or: [
+            $and: [
+                { state: true },
+                { visible: true },
+                publisher == 'publisher'
+                ? { publisher }
+                : {},
+                query != ' '
+                ? {
+                    $or:[
+                        { title : new RegExp(query, 'i') },
                 { title : new RegExp(query, 'i') }, 
-                { description : new RegExp(query, 'i')}
-            ]
-        });
+                        { title : new RegExp(query, 'i') },
+                        { description : new RegExp(query, 'i')},
+                    ]
+                }
+                : {},
+                valueTime
+                ? { createdAt: { $gte: valueTime }  }
+                : { },
+                category
+                ? { category }
+                : { }
+            ],
+        })
+        .sort( order ? orderAd : '-createdAt' );
         if ( !ads ) {
-            return res.status(404).json({  msg :  'No se encontraron resultados' });
+            return res.status(404).json({  msg : `No se encontraron resultados ` });
         }
         res.status(200).json({
             totalRows: ads.length,
             ads
         });
     } catch (error) {
-        return res.status(500).json({  msg :  'No se encontraron anuncios' });
+        return res.status(500).json({  msg :  `No se encontraron anuncios ${error} ` });
     }
 } 
 

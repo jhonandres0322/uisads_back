@@ -11,7 +11,8 @@ const {
     manageRating,
     getAdsByPublisher,
     getAds,
-    searchAds
+    searchAds,
+    getAdsByCategory
 } = require("../controllers/ad_controller");
 
 // * Importacion de middlewares
@@ -58,7 +59,7 @@ router.get('/category/:id',
     check('id','No es una categoria valida').isMongoId(),
     check('id').custom(validateCategoryExists),
     validateFields,
-    getAdsByPublisher
+    getAdsByCategory
 )
 
 // * Ruta que crea un anuncio
@@ -79,7 +80,7 @@ router.put('/:id',
     check('id').custom(validateAdExists),
     validateFields,
     updateAd
-);
+);  
 
 // * Ruta que elimina un anuncio
 router.delete('/:id',
@@ -101,7 +102,7 @@ router.post('/rating/:id',
 );
 
 // * Ruta que busca los anuncios
-router.get('/search/:query',
+router.get('/search/:query?',
     validateJWT,
     searchAds
 );
