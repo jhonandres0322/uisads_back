@@ -29,7 +29,7 @@ const { validateExistsProfile } = require("../middlewares/validate_user");
 const router = Router();
 
 // * Ruta que lista todos los anuncios
-router.get('/',
+router.get('/:page',
     validateJWT,
     validateFields,
     getAds

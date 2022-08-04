@@ -15,9 +15,9 @@ const Vote = require('../models/vote_model');
 // * Controlador para mostrar todos los anuncios
 const getAds = async( req = request, res = response ) => {
     try {
-        const { pageValue } = req.body;
-        const page = {
-            number: pageValue,
+        const { page } = req.params;
+        const pageValue = {
+            number: page,
             size: process.env.PAGE_SIZE
         };
         const ads = await Ad.find({
@@ -27,8 +27,9 @@ const getAds = async( req = request, res = response ) => {
         .sort('-createdAt')
         .select(' title main_page createdAt category')
         .populate('main_page')
-        .skip(( page.number - 1 ) * page.size )
-        .limit( page.size );
+        .skip(( pageValue.number - 1 ) * pageValue.size )
+        .limit( pageValue.size );
+        console.log('ads -->', ads);
         const totalRows = ads.length;
         if ( !ads ) {
             return res.status(404).json({ msg : 'No se encontraron anuncios' });
