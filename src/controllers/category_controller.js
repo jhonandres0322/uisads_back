@@ -19,6 +19,22 @@ const getCategories = async ( req = request, res = response ) => {
     }
 }
 
+const getCategoryById = async ( req = request, res = response ) => {
+    try {
+        const { id } = req.params;
+        const category = await Category.findById( id );
+        if ( !category ) {
+            return res.status(400).json({ msg : 'No se encontraron las categorias' });
+        }
+        res.status(200).json({
+            category
+        })
+    } catch (error) {
+        return res.status(400).json({ msg : 'No se encontraron las categorias' });
+    }
+
+}
+
 // * Controlador para crear categorias
 const createCategory = async ( req = request, res = response ) => {
     try {
@@ -46,5 +62,6 @@ const createCategory = async ( req = request, res = response ) => {
 
 module.exports = {
     createCategory,
-    getCategories
+    getCategories,
+    getCategoryById
 }
