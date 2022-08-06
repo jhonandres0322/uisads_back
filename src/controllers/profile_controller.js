@@ -54,12 +54,13 @@ const updateProfile = async ( req = request, res = response ) => {
 //* Controlador para calcular el rating del perfil
 const calculateRatingProfile = async ( req = request, res = response ) => {
     try {
-        const { user } = req;
-        const profile = await Profile.findOne({ user });
+        const { idProfile } = req.body;
+        const profile = await Profile.findById( idProfile );
         if ( !profile ) {
             return res.status(404).json({ msg : 'No se pudo calcular la califación del usuario.' });
         } 
         const ads = await Ad.find({ publisher: profile._id });
+        const publications = ads.length;
         let points_positive = 0;
         let points_negative = 0;
         ads.forEach(element => {
@@ -67,15 +68,20 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
             points_negative += element.negative_points;
         });
         const score = points_positive - points_negative;
-        const profileUpdated = await Profile.findOneAndUpdate({user},{
+        const calification = points_positive + points_negative;
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
             score
         });
         if ( !profileUpdated ) {
             return res.status(404).json({ msg : 'No se pudo calcular la califación del usuario.' });
         }
-        res.status(200).json({ msg: 'Calificación calculada con exito' });
+        res.status(200).json({ 
+            publications,
+            calification,
+            score
+        });
     } catch (error) {
-        return res.status(500).json({ msg : 'No se pudo calcular la califación del usuario.' });
+        return res.status(500).json({ msg : `No se pudo calcular la califación del usuario. ${error}` });
     }
 }
 
