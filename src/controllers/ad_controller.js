@@ -29,7 +29,6 @@ const getAds = async( req = request, res = response ) => {
         .populate('main_page')
         .skip(( pageValue.number - 1 ) * pageValue.size )
         .limit( pageValue.size );
-        console.log('ads -->', ads);
         const totalRows = ads.length;
         if ( !ads ) {
             return res.status(404).json({ msg : 'No se encontraron anuncios' });
@@ -104,11 +103,10 @@ const getAdsByPublisher = async ( req = request, res = response) => {
 
 // * Controlador para mostrar un anuncio
 const getAd = async( req = request, res = response ) => {
+    console.log('estoy entrando aca en el getAd');
     const { id } = req.params;
     try {
-        const ad = await Ad.findById(id)
-                            .populate('images')
-                            .populate('publisher');
+        const ad = await Ad.findById(id).populate('images').populate('main_page');
         if ( !ad ) {
             return res.status(400).json({  msg :  'No se encontró el anuncio' });
         }
@@ -197,9 +195,8 @@ const deleteAd = async( req = request, res = response ) => {
 */
 const manageRating = async ( req = request, res = response ) => {
     try {
-        const { id } = req.params; 
         const { user } = req;
-        const { choice } = req.body; 
+        const { choice, adId } = req.body; 
         const options = ['like', 'dislike'];
         const isOptionValidate = options.find( opt => opt == choice )
         if ( !isOptionValidate ) {
@@ -209,17 +206,23 @@ const manageRating = async ( req = request, res = response ) => {
         if ( !profile ) {
             return res.status(400).json({  msg :  'No se encontro un perfil valido' });
         }
-        const ad = await Ad.findById(id);
+        const ad = await Ad.findById(adId);
         if ( !ad ) {
             return res.status(400).json({  msg :  'No se encontro el anuncio' });
         } else {
+            if( JSON.stringify( profile._id ) == JSON.stringify( ad.publisher ) ) {
+                return res.status(400).json({  msg :  'No se puede calificar un anuncio propio' });
+            }
             const vote = await Vote.findOne({
                 voter: profile._id,
                 ad: ad._id
             });
             let updatePoints;
             if ( vote ) {
+                console.log('vote --> ', vote.type);
+                console.log('choice --> ', choice);
                 if ( vote.type == choice ) {
+                    console.log('validando');
                     return res.status(400).json({ msg: 'No se pudo reaccionar al anuncio' });
                 } else {
                     const voteUpdated = await Vote.findByIdAndUpdate(

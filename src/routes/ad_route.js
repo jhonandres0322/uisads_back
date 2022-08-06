@@ -29,7 +29,7 @@ const { validateExistsProfile } = require("../middlewares/validate_user");
 const router = Router();
 
 // * Ruta que lista todos los anuncios
-router.get('/:page',
+router.get('/ads/:page',
     validateJWT,
     validateFields,
     getAds
@@ -93,11 +93,8 @@ router.delete('/:id',
 );
 
 // * Ruta que gestiona la calificación de un anuncio
-router.post('/rating/:id', 
+router.post('/rating', 
     validateJWT,
-    check('id', 'No es un id valido').isMongoId(),
-    check('id').custom(validateAdExists),
-    validateFields,
     manageRating
 );
 
