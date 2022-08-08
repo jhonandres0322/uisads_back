@@ -296,7 +296,7 @@ const searchAds = async ( req = request, res = response ) => {
                 ? { category }
                 : { }
             ],
-        })
+        }).populate('images').populate('main_page')
         .sort( order ? orderAd : '-createdAt' );
         if ( !ads ) {
             return res.status(404).json({  msg : `No se encontraron resultados ` });
