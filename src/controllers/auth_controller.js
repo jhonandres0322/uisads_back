@@ -101,14 +101,14 @@ const registerUser = async (req = request,res = response ) => {
 // * Controlador para cambiar la contraseña
 const changePassword = async ( req = request, res = response ) => {
     try {
-        const { passwordOld, passwordNew } = req.body;
+        const { oldPassword, newPassword } = req.body;
         const { user } = req;
         const userPass = await User.findOne( { email: user.email } ).select('password');
-        const isPassword = validatePassword( userPass.password, passwordOld ); 
+        const isPassword = validatePassword( userPass.password, oldPassword ); 
         if ( !isPassword ) {
             return res.status(400).json({ msg : 'La contraseñas no coinciden' });
         }
-        const password = createPassword( passwordNew );
+        const password = createPassword( newPassword );
         const userUpdated = await User.findByIdAndUpdate( userPass._id, {
             password
         });
