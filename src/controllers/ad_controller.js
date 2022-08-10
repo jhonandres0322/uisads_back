@@ -261,8 +261,8 @@ const manageRating = async ( req = request, res = response ) => {
 // * Controlador para buscar anuncios
 const searchAds = async ( req = request, res = response ) => {
     try {
-        const { query } = req.params;
-        const { publisher, time, category, order } = req.body;
+        // la variable publisher sirve para la busqueda dentro del perfil de usuario
+        const { publisher, time, category, order, query } = req.body;
         let orderAd = '';
         if( order ) {
             order.value == 'asc' ? orderAd = '+' : orderAd = '-'; 
@@ -276,14 +276,12 @@ const searchAds = async ( req = request, res = response ) => {
             $and: [
                 { state: true },
                 { visible: true },
-                publisher == 'publisher'
+                publisher
                 ? { publisher }
                 : {},
-                query != ' '
+                query
                 ? {
                     $or:[
-                        { title : new RegExp(query, 'i') },
-                { title : new RegExp(query, 'i') }, 
                         { title : new RegExp(query, 'i') },
                         { description : new RegExp(query, 'i')},
                     ]
@@ -296,7 +294,9 @@ const searchAds = async ( req = request, res = response ) => {
                 ? { category }
                 : { }
             ],
-        }).populate('images').populate('main_page')
+        })
+        // .populate('images')
+        // .populate('main_page')
         .sort( order ? orderAd : '-createdAt' );
         if ( !ads ) {
             return res.status(404).json({  msg : `No se encontraron resultados ` });

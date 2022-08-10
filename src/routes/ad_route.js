@@ -99,7 +99,7 @@ router.post('/rating',
 );
 
 // * Ruta que busca los anuncios
-router.get('/search/:query?',
+router.post('/search',
     validateJWT,
     searchAds
 );
