@@ -75,26 +75,25 @@ const getAdsByCategory = async ( req = request, res = response ) => {
 // * Controlador para mostrar los anuncios por publicador
 const getAdsByPublisher = async ( req = request, res = response) => {
     try {
-        const { id } = req.params;
-        const { pageValue } = req.body;
-        const page = {
-            number: pageValue,
-            size: process.env.PAGE_SIZE
-        };
-        const ads = await Ad.find({
+        const { id, orden, pageValue } = req.params;
+        var sort = orden == 'date' ? { createdAt : -1 } : { score : -1 };
+        const query = {
             state: true,
             visible: true,
             publisher: id
-        })
-        .sort('-createdAt')
-        .select(' title main_page createdAt category')
-        .populate('main_page')
-        .skip(( page.number - 1 ) * page.size )
-        .limit( page.size );        
-        const totalRows = ads.length;
+        }
+        const options = {
+            page: pageValue,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category score publisher',
+            sort,
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query,options);
+        const totalRows = ads.docs.length;
         res.status(200).json({
             totalRows,
-            ads 
+            ads: ads.docs 
         });
     } catch (error) {
         return res.status(500).json({ msg : 'No se encontraron anuncios' })

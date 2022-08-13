@@ -45,7 +45,7 @@ router.get('/:id',
 );
 
 // * Ruta que lista todos los anuncios de un perfil de usuario
-router.get('/publisher/:id',
+router.get('/publisher/:id/:orden/:pageValue',
     validateJWT,
     check('id','No es un perfil valido').isMongoId(),
     check('id').custom(validateExistsProfile),

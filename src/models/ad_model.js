@@ -1,4 +1,5 @@
 const { model, Schema } = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const schemaAd = new Schema({
     title: String,
@@ -45,5 +46,7 @@ schemaAd.pre("save", function(next) {
     this.main_page = this.images[0];
     next();
 });
+
+schemaAd.plugin(mongoosePaginate);
 
 module.exports = model('Ad', schemaAd);
