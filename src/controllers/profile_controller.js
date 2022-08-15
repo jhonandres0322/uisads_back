@@ -59,7 +59,7 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
         if ( !profile ) {
             return res.status(404).json({ msg : 'No se pudo calcular la califación del usuario.' });
         } 
-        const ads = await Ad.find({ publisher: profile._id });
+        const ads = await Ad.find({ publisher: profile._id, visible: true, state: true });
         const publications = ads.length;
         let points_positive = 0;
         let points_negative = 0;
