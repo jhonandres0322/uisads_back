@@ -147,14 +147,18 @@ const createAd = async( req = request, res = response ) => {
 }
 
 // * Controlador para actualizar un anuncio
-const updateAd = async( req = request, res = response ) => {
+const updateAd = async ( req = request, res = response ) => {
+    console.log('entrando al controlador');
     const { title, description, visible } = req.body;
     const { id } = req.params;
+    const { images } = req;
     try {
         const adUpdate = await Ad.findByIdAndUpdate(id,{
             title,
             description,
-            visible
+            visible,
+            images,
+            main_page: images[0]
         });
         if ( !adUpdate ) {
             return res.status(400).json({  msg :  'No se pudo actualizar el anuncio' });
@@ -163,7 +167,8 @@ const updateAd = async( req = request, res = response ) => {
             msg: 'El anuncio se actualizo con exito'
         });
     } catch (error) {
-        return res.status(500).json({  msg :  'No se pudo actualizar el anuncio'  });
+        console.log('error ->', error);
+        return res.status(500).json({  msg :  `No se pudo actualizar el anuncio ${error}`  });
     }
 }
 

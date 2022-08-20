@@ -17,8 +17,9 @@ const organizeImage = ( file ) => {
     const content = file.content;
     const name = file.name;
     const type = file.type;
+    const index = file.index;
     return {
-        content, name, type
+        content, name, type, index
     }
 }
 

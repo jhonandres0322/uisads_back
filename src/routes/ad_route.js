@@ -23,7 +23,7 @@ const {
     validateOwnerAd,
     validateCategoryExists
 } = require('../middlewares/validate_ad');
-const { saveImages } = require('../middlewares/upload_middleware');
+const { saveImages, updateImages } = require('../middlewares/upload_middleware');
 const { validateExistsProfile } = require("../middlewares/validate_user");
 
 const router = Router();
@@ -76,6 +76,7 @@ router.post('/',
 router.put('/:id',
     validateJWT,
     validateOwnerAd,
+    updateImages,
     check('id','No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
     validateFields,
