@@ -3,16 +3,16 @@ const { request, response } = require('express');
 
 // * Importación de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
-const { validatePassword, createPassword } = require('../helpers/user');
+const { validatePassword, createPassword } = require('../helpers/user_helper');
 
 // * Importación de modelos
-const User = require('../models/user');
-const Profile = require('../models/profile');
+const User = require('../models/user_model');
+const Profile = require('../models/profile_model');
 
 // * Importación de servicios
-const { generateOTP } = require('../services/otp');
-const { sendEmail } = require('../services/mail');
-const { createProfile } = require('../helpers/profile');
+const { generateOTP } = require('../services/otp_service');
+const { sendEmail } = require('../services/mail_service');
+const { createProfile } = require('../helpers/profile_helper');
 
 
 // * Controlador para iniciar sesión en el servidor
@@ -45,7 +45,7 @@ const login = async (req = request,res = response ) => {
                     blocked: true
                 });
             }
-            return res.status(400).json({ msg : 'Contraseña Incorrecta' });
+            return res.status(400).json({ msg : 'Contraseña Incorrecta', error: true });
         }
         const token = await generarJWT( user._id );
         const lastEntry = new Date();
@@ -55,12 +55,15 @@ const login = async (req = request,res = response ) => {
             retry: 0,
             blocked : false
         });
-        const profile = await Profile.findOne({user: user._id});
+        const profile = await Profile.findOne({user: user._id}).populate('image');
+        const userEmail = await User.findById(user).select('email');
         res.json({
             msg: 'Inicio de sesión correcto',
             user,
             token,
-            profile
+            profile,
+            email: userEmail,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({ msg : 'Error al loguearse' });
@@ -87,7 +90,8 @@ const registerUser = async (req = request,res = response ) => {
             msg: 'Usuario Creado con Exito',
             token,
             user: userSaved,
-            profile: profileSaved
+            profile: profileSaved,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({ msg : 'No se pudo crear el perfil' });
@@ -97,14 +101,14 @@ const registerUser = async (req = request,res = response ) => {
 // * Controlador para cambiar la contraseña
 const changePassword = async ( req = request, res = response ) => {
     try {
-        const { passwordOld, passwordNew } = req.body;
+        const { oldPassword, newPassword } = req.body;
         const { user } = req;
         const userPass = await User.findOne( { email: user.email } ).select('password');
-        const isPassword = validatePassword( userPass.password, passwordOld ); 
+        const isPassword = validatePassword( userPass.password, oldPassword ); 
         if ( !isPassword ) {
             return res.status(400).json({ msg : 'La contraseñas no coinciden' });
         }
-        const password = createPassword( passwordNew );
+        const password = createPassword( newPassword );
         const userUpdated = await User.findByIdAndUpdate( userPass._id, {
             password
         });

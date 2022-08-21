@@ -2,7 +2,7 @@ const { Router } = require('express');
 
 const router = Router();
 
-const { createCity,  getCities, getCityById } = require('../controllers/city');
+const { createCity,  getCities, getCityById } = require('../controllers/city_controller');
 
 router.get('/',getCities);
 router.post('/', createCity);

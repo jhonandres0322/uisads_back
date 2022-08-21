@@ -2,7 +2,7 @@
 const { request, response } = require('express');
 
 // * Importación de los modelos
-const Profile = require('../models/profile')
+const Profile = require('../models/profile_model')
 
 // * Función para buscar el perfil por el id del usuario
 const searchProfile =  async ( idUser ) => {

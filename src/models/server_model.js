@@ -5,12 +5,12 @@ const cors = require('cors');
 const path = require('path');
 
 // * Llamado de rutas
-const profileRoutes = require('../routes/profile');
-const adRoutes = require('../routes/ad');
-const authRoutes = require('../routes/auth');
-const categoryRoutes = require('../routes/category');
-const uploadRoutes = require('../routes/upload');
-const cityRoutes = require('../routes/city');
+const profileRoutes = require('../routes/profile_route');
+const adRoutes = require('../routes/ad_route');
+const authRoutes = require('../routes/auth_route');
+const categoryRoutes = require('../routes/category_route');
+const uploadRoutes = require('../routes/upload_route');
+const cityRoutes = require('../routes/city_route');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -44,8 +44,8 @@ class Server{
     // * Middlewares del servidor
     middlewares(){
         this.app.use( cors()) ;
-        this.app.use( express.json() );
-        this.app.use( express.urlencoded({ extended: true }) );
+        this.app.use( express.json({ limit: '50mb'}) );
+        this.app.use( express.urlencoded({ extended: true, limit: '50mb' }) );
         this.app.use( morgan('dev') );
         this.app.use( errorHandler );
     }

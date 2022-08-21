@@ -1,7 +1,7 @@
 // * Importación de los modelos
-const Ad = require('../models/ad');
-const Profile = require('../models/profile');
-const Category = require('../models/category');
+const Ad = require('../models/ad_model');
+const Profile = require('../models/profile_model');
+const Category = require('../models/category_model');
 
 // * Middleware para validar si existe un anuncio por id
 const validateAdExists = async (id) => {

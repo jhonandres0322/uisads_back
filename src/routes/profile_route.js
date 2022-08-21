@@ -4,14 +4,13 @@ const { check, body } = require('express-validator');
 
 // * Llamado de los controladores
 const { 
-    createProfile, 
     getProfile, 
     updateProfile, 
     calculateRatingProfile 
-} = require("../controllers/profile");
+} = require("../controllers/profile_controller");
 
 // * Llamado de los middlewares
-const { saveImages, upload } = require("../middlewares/upload");
+const { saveImageProfile } = require("../middlewares/upload_middleware");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
 const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
@@ -30,8 +29,7 @@ router.get('/:id',
 router.put('/:id',
     validateJWT,
     check('id','No es un id valido').isMongoId(),
-    upload.single('image'),
-    // saveImages,
+    saveImageProfile,
     check('id').custom(validateExistsProfile),
     check('cellphone','Debe ser un número de telefono valido')
         .if( body('cellphone').exists() )

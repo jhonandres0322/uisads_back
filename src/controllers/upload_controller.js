@@ -2,7 +2,7 @@
 const { response, request } = require('express');
 
 // * Importación de los modelos
-const Upload = require('../models/upload');
+const Upload = require('../models/upload_model');
 
 // * Controlador para eliminar una imagen
 const deleteUpload = async (req = request, res = response) => {

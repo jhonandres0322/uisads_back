@@ -9,7 +9,7 @@ const {
     changePassword,
     forgotPassword,
     validateCodeOTP
-} = require('../controllers/auth');
+} = require('../controllers/auth_controller');
 
 // * Importación de los middlewares
 const { validateFields } = require("../middlewares/validate_fields");
