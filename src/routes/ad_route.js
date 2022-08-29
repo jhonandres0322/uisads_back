@@ -11,8 +11,9 @@ const {
     manageRating,
     getAdsByPublisher,
     getAds,
-    searchAds
-} = require("../controllers/ad");
+    searchAds,
+    getAdsByCategory
+} = require("../controllers/ad_controller");
 
 // * Importacion de middlewares
 const { validateFields } = require("../middlewares/validate_fields");
@@ -22,13 +23,13 @@ const {
     validateOwnerAd,
     validateCategoryExists
 } = require('../middlewares/validate_ad');
-const { saveImages, upload } = require('../middlewares/upload');
+const { saveImages, updateImages } = require('../middlewares/upload_middleware');
 const { validateExistsProfile } = require("../middlewares/validate_user");
 
 const router = Router();
 
 // * Ruta que lista todos los anuncios
-router.get('/',
+router.get('/ads/:page',
     validateJWT,
     validateFields,
     getAds
@@ -44,7 +45,7 @@ router.get('/:id',
 );
 
 // * Ruta que lista todos los anuncios de un perfil de usuario
-router.get('/publisher/:id',
+router.get('/publisher/:id/:orden/:pageValue',
     validateJWT,
     check('id','No es un perfil valido').isMongoId(),
     check('id').custom(validateExistsProfile),
@@ -58,14 +59,13 @@ router.get('/category/:id',
     check('id','No es una categoria valida').isMongoId(),
     check('id').custom(validateCategoryExists),
     validateFields,
-    getAdsByPublisher
+    getAdsByCategory
 )
 
 // * Ruta que crea un anuncio
 router.post('/',
     validateJWT,
-    // upload.array('images',5),
-    // saveImages,
+    saveImages,
     check('title', 'El titulo del anuncio es obligatorio').not().isEmpty(),
     check('description','La descripción es obligatoria').not().isEmpty(),
     validateFields,
@@ -76,12 +76,12 @@ router.post('/',
 router.put('/:id',
     validateJWT,
     validateOwnerAd,
-    upload.array('images',5),
+    updateImages,
     check('id','No es un id valido').isMongoId(),
     check('id').custom(validateAdExists),
     validateFields,
     updateAd
-);
+);  
 
 // * Ruta que elimina un anuncio
 router.delete('/:id',
@@ -94,16 +94,13 @@ router.delete('/:id',
 );
 
 // * Ruta que gestiona la calificación de un anuncio
-router.post('/rating/:id', 
+router.post('/rating', 
     validateJWT,
-    check('id', 'No es un id valido').isMongoId(),
-    check('id').custom(validateAdExists),
-    validateFields,
     manageRating
 );
 
 // * Ruta que busca los anuncios
-router.get('/search/:query',
+router.post('/search',
     validateJWT,
     searchAds
 );

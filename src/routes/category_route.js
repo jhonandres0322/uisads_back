@@ -2,13 +2,17 @@
 const  { Router } = require('express');
 const { check } = require('express-validator');
 // * Llamado de los controladores
-const { createCategory, getCategories } = require('../controllers/category');
+const { createCategory, getCategories, getCategoryById } = require('../controllers/category_controller');
 
 const router = Router();
 
 // * Ruta para listar todas las categorias
 router.get('/',
     getCategories
+)
+
+router.get('/:id',
+    getCategoryById
 )
 
 // * Ruta para crear las categorias

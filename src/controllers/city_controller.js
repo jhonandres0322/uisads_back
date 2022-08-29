@@ -1,4 +1,4 @@
-const City = require('../models/city');
+const City = require('../models/city_model');
 const { request, response } = require('express');
 
 const createCity = async ( req = request, res = response ) => {

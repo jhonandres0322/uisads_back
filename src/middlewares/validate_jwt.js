@@ -3,7 +3,7 @@ const { response, request } = require('express');
 const jwt = require('jsonwebtoken');
 
 // * Importación del modelo
-const User = require('../models/user');
+const User = require('../models/user_model');
 
 // * Middleware que valida un token enviado desde el request
 // * Ademas valida si el usuario se encuentra registrado

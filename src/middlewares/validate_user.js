@@ -2,8 +2,8 @@
 const { request, response } = require('express');
 
 // * Importación de los modelos
-const User = require('../models/user');
-const Profile = require('../models/profile');
+const User = require('../models/user_model');
+const Profile = require('../models/profile_model');
 
 // * Middleware para validar si ya existe un usuario con ese email
 const isEmailExists = async ( email = '' ) => {

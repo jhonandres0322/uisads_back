@@ -1,4 +1,5 @@
 const { model, Schema } = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const schemaAd = new Schema({
     title: String,
@@ -11,6 +12,10 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     }],
+    main_page: {
+        type: Schema.Types.ObjectId,
+        ref: 'Upload'
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category'
@@ -39,5 +44,13 @@ const schemaAd = new Schema({
 },{
     timestamps: true
 });
+
+
+schemaAd.pre("save", function(next) {
+    this.main_page = this.images[0];
+    next();
+});
+
+schemaAd.plugin(mongoosePaginate);
 
 module.exports = model('Ad', schemaAd);
