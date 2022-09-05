@@ -62,6 +62,14 @@ router.get('/category/:id',
     getAdsByCategory
 )
 
+// * Ruta que lista todos los anuncios por una categoria
+router.post('/category/:id',
+    validateJWT,
+    check('id','No es una categoria valida').isMongoId(),
+    check('id').custom(validateCategoryExists),
+    validateFields,
+    getAdsByCategory
+)
 // * Ruta que crea un anuncio
 router.post('/',
     validateJWT,
