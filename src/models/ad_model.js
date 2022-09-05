@@ -12,6 +12,10 @@ const schemaAd = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Upload'
     }],
+    main_page: {
+        type: Schema.Types.ObjectId,
+        ref: 'Upload'
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'Category'
@@ -29,16 +33,18 @@ const schemaAd = new Schema({
         type: Number,
         default: 0
     },
+    score: {
+        type: Number,
+        default: 0
+    }
 },{
     timestamps: true
 });
 
-schemaAd.virtual('main_page').get( function() {
-    return this.images[0];
-});
 
-schemaAd.virtual('score').get( function() {
-    return this.positive_points - this.negative_points;
+schemaAd.pre("save", function(next) {
+    this.main_page = this.images[0];
+    next();
 });
 
 schemaAd.plugin(mongoosePaginate);
