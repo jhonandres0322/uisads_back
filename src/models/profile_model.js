@@ -24,18 +24,19 @@ const schemaProfile = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'City'
     },
-    interests : [{
+    interests : [String],
+    notifications: [{
         type: Schema.Types.ObjectId,
-        ref: 'Interest'
+        ref: 'Ad'
     }],
     favorites: [{
         type: Schema.Types.ObjectId,
         ref: 'Ad'
     }],
-    historial: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Ad'
-    }]
+    isNotify: {
+        type: Boolean,
+        default: false
+    }
 },{
     timestamps: true
 });

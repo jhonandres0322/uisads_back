@@ -22,18 +22,7 @@ const schemaUser = new Schema({
     lastEntry: Date,
     available: Boolean,
     otp: String,
-    guest: {
-        type: Boolean,
-        default: false
-    },
-    facebook: {
-        type: Boolean,
-        default: false
-    },
-    google: {
-        type: Boolean,
-        default: false
-    }
+    typeRegister: String
 },{
     timestamps: true
 })
