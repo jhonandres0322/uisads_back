@@ -11,6 +11,7 @@ const authRoutes = require('../routes/auth_route');
 const categoryRoutes = require('../routes/category_route');
 const uploadRoutes = require('../routes/upload_route');
 const cityRoutes = require('../routes/city_route');
+const reportRoutes = require('../routes/report_route');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -29,6 +30,7 @@ class Server{
         this.uploadPath = '/api/upload';
         this.reportPath = '/api/report';
         this.cityPath = '/api/city';
+        this.reportPath = '/api/report';
         // Connection Database
         this.connectDatabase();
         // Middlewares

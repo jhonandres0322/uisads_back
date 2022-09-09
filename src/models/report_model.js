@@ -6,9 +6,6 @@ const schemaReport = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Profile'
     },
-    description: {
-        type: String
-    },
     ad: {
         type: Schema.Types.Boolean,
         ref: 'Ad'
