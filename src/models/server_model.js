@@ -12,6 +12,7 @@ const categoryRoutes = require('../routes/category_route');
 const uploadRoutes = require('../routes/upload_route');
 const cityRoutes = require('../routes/city_route');
 const reportRoutes = require('../routes/report_route');
+const interestRoutes = require('../routes/interest_route');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -31,6 +32,7 @@ class Server{
         this.reportPath = '/api/report';
         this.cityPath = '/api/city';
         this.reportPath = '/api/report';
+        this.interestPath = '/api/interest';
         // Connection Database
         this.connectDatabase();
         // Middlewares
@@ -62,6 +64,7 @@ class Server{
         this.app.use(this.uploadPath, uploadRoutes);
         this.app.use(this.reportPath, reportRoutes);
         this.app.use(this.cityPath, cityRoutes);
+        this.app.use(this.interestPath, interestRoutes);
     }
 
     // * Activación del servidor
