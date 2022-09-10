@@ -4,7 +4,7 @@ const { request, response } = require('express');
 // * Importación de los helpers
 const { deleteUploads } = require('../helpers/upload_helper');
 const { searchProfile } = require('../helpers/profile_helper');
-const { makePagination, updatePointsAd, createDateFilter } = require('../helpers/ad_helper');
+const { updatePointsAd, createDateFilter } = require('../helpers/ad_helper');
 
 // * Importación de los modelos
 const Ad = require('../models/ad_model');
@@ -13,27 +13,29 @@ const Vote = require('../models/vote_model');
 
 
 // * Controlador para mostrar todos los anuncios
-const getAds = async( req = request, res = response ) => {
+const getAds = async ( req = request, res = response ) => {
     try {
         const { page } = req.params;
-        const pageValue = {
-            number: page,
-            size: process.env.PAGE_SIZE
-        };
-        const ads = await Ad.find({
+        const query = {
             state: true,
             visible: true,
-        })
-        .sort('-createdAt')
-        .select(' title main_page createdAt category')
-        .populate('main_page')
-        .skip(( pageValue.number - 1 ) * pageValue.size )
-        .limit( pageValue.size );
-        const totalRows = ads.length;
+        }
+        const options = {
+            page: page,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category',
+            sort: { createAd : -1 },
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query, options);
         if ( !ads ) {
             return res.status(404).json({ msg : 'No se encontraron anuncios' });
         }
-        res.status(200).json({ totalRows, ads });
+        const totalRows = ads.docs.length;
+        res.status(200).json({
+            totalRows,
+            ads: ads.docs
+        });
     } catch (error ) {
         return res.status(500).json({  msg : `No se pueden visualizar los anuncios ${error}` });
     }
@@ -45,27 +47,26 @@ const getAdsByCategory = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
         const { pageValue } = req.body;
-        const page = {
-            number: pageValue,
-            size: process.env.PAGE_SIZE
-        };
-        const ads = await Ad.find({
+        const query = {
             state: true,
             visible: true,
             category: id
-        })
-        .sort('-createdAt')
-        .select(' title main_page createdAt category')
-        .populate('main_page')
-        .skip(( page.number - 1 ) * page.size )
-        .limit( page.size );
+        }
+        const options = {
+            page: pageValue,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category',
+            sort: { createAd : -1 },
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query, options);
         if ( !ads ) {
             return res.status(404).json({ msg : 'No se encontraron anuncios' });
         }
-        const totalRows = ads.length;
+        const totalRows = ads.docs.length;
         res.status(200).json({
             totalRows,
-            ads 
+            ads: ads.docs
         });
     } catch (error) {
         return res.status(500).json({  msg : `No se pueden visualizar los anuncios ${error}` })
@@ -90,6 +91,9 @@ const getAdsByPublisher = async ( req = request, res = response) => {
             populate: 'main_page'
         };
         const ads = await Ad.paginate(query,options);
+        if ( !ads ) {
+            return res.status(404).json({ msg : 'No se encontraron anuncios' });
+        }
         const totalRows = ads.docs.length;
         res.status(200).json({
             totalRows,
@@ -101,8 +105,7 @@ const getAdsByPublisher = async ( req = request, res = response) => {
 }
 
 // * Controlador para mostrar un anuncio
-const getAd = async( req = request, res = response ) => {
-    console.log('estoy entrando aca en el getAd');
+const getAd = async ( req = request, res = response ) => {
     const { id } = req.params;
     try {
         const ad = await Ad.findById(id).populate('images').populate('main_page');
@@ -118,7 +121,7 @@ const getAd = async( req = request, res = response ) => {
 }
 
 // * Controlador para crear un anuncio
-const createAd = async( req = request, res = response ) => {
+const createAd = async ( req = request, res = response ) => {
     const { title, description, visible, category } = req.body;
     const { user, images } = req;
     try {
@@ -148,7 +151,6 @@ const createAd = async( req = request, res = response ) => {
 
 // * Controlador para actualizar un anuncio
 const updateAd = async ( req = request, res = response ) => {
-    console.log('entrando al controlador');
     const { title, description, visible } = req.body;
     const { id } = req.params;
     const { images } = req;
@@ -173,7 +175,7 @@ const updateAd = async ( req = request, res = response ) => {
 }
 
 // * Controlador para eliminar un anuncio
-const deleteAd = async( req = request, res = response ) => {
+const deleteAd = async ( req = request, res = response ) => {
     try {
         const { id } = req.params;
         const adsDelete = await Ad.findByIdAndUpdate(id, { state: false });
@@ -223,10 +225,7 @@ const manageRating = async ( req = request, res = response ) => {
             });
             let updatePoints;
             if ( vote ) {
-                console.log('vote --> ', vote.type);
-                console.log('choice --> ', choice);
                 if ( vote.type == choice ) {
-                    console.log('validando');
                     return res.status(400).json({ msg: 'No se pudo reaccionar al anuncio' });
                 } else {
                     const voteUpdated = await Vote.findByIdAndUpdate(
@@ -312,18 +311,8 @@ const searchAds = async ( req = request, res = response ) => {
     } catch (error) {
         return res.status(500).json({  msg :  `No se encontraron anuncios ${error} ` });
     }
-} 
-
-const saveFavorite = async ( req = request, res = response ) => {
-    try {
-        
-    } catch (error) {
-        console.log(' CONTROLLER SAVE FAVORITE -->', error );
-        return res.status(500).json({
-            msg: 'No se pudo ingresar al aplicativo'
-        });
-    }
 }
+
 
 module.exports = {
     createAd,
@@ -335,5 +324,4 @@ module.exports = {
     manageRating,
     getAdsByCategory,
     searchAds,
-    saveFavorite
 }

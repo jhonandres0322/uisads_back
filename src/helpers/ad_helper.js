@@ -1,23 +1,5 @@
 // * Importación del modelo
 const Ad = require('../models/ad_model');
-const mongoose = require('mongoose');
-
-
-// * Función para generar la paginación en los anuncios
-// * Tambien sirve para filtrar los anuncios y buscar por cierta condición
-const makePagination = async ( page = { }, sort = {}, condition = { }, filter = { } ) => {
-    const ads = await Ad.find({
-        [condition.key]: condition.value,
-        state: true,
-        [filter.key]: new RegExp(filter.value, 'i')
-    })
-    .populate('publisher')
-    .populate('category')
-    .sort({ [ sort.value ] : sort.direction })
-    .skip(( page.number - 1 ) * page.size )
-    .limit( page.size );
-    return ads;
-}
 
 const updatePointsAd = async (choice, ad, type) => {
 
@@ -72,7 +54,6 @@ const createDateFilter = ( typeDate ) => {
 }
 
 module.exports = {
-    makePagination,
     updatePointsAd,
     createDateFilter
 }
