@@ -6,14 +6,19 @@ const { check, body } = require('express-validator');
 const { 
     getProfile, 
     updateProfile, 
-    calculateRatingProfile 
+    calculateRatingProfile,
+    saveAdFavorite,
+    getFavorites,
+    deleteFavorite
 } = require("../controllers/profile_controller");
 
 // * Llamado de los middlewares
 const { saveImageProfile } = require("../middlewares/upload_middleware");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
-const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
+const { validateExistsProfile } = require("../middlewares/validate_user");
+const { validateAdExists } =  require('../middlewares/validate_ad');
+
 
 const router = Router();
 
@@ -43,5 +48,28 @@ router.post('/calculate',
     validateJWT,
     calculateRatingProfile
 );
+
+router.post('/favorite-ad',
+    validateJWT,
+    check('id','No es un id valido').isMongoId(),
+    check('id').custom(validateAdExists),
+    validateFields,
+    saveAdFavorite
+);
+
+router.get('/favorite-ad/:page',
+    validateJWT,
+    validateFields,
+    getFavorites
+);
+
+router.delete('/favorite-ad/:id',
+    validateJWT,
+    check('id','No es un id valido').isMongoId(),
+    check('id').custom(validateAdExists),
+    validateFields,
+    deleteFavorite
+);
+
 
 module.exports = router;

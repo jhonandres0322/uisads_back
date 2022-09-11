@@ -118,7 +118,7 @@ const sendNotifications = async ( req = request, res = response ) => {
     }
 } 
 
-const disabledNotifications = async ( req = request, res = response ) => {
+const manageNotifications = async ( req = request, res = response ) => {
     try {
         
     } catch (error) {
@@ -129,6 +129,94 @@ const disabledNotifications = async ( req = request, res = response ) => {
     }
 }
 
+const saveAdFavorite = async ( req = request, res = response ) => {
+    try {
+        const { id } = req.body;
+        const { user } = req;
+        const profile = await Profile.findOne({ user: user._id });
+        profile.favorites.push(id);
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            favorites: profile.favorites
+        });
+        if ( !profileUpdated ) {
+            return res.status(404).json({ msg : 'No se pudo guardar el anuncio en favoritos.' });
+        }
+        res.status(200).json({
+            msg: 'Anuncio guardado en favoritos'
+        });
+    } catch (error) {
+        console.log(' CONTROLLER DISABLED NOTIFICATIONS -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const getFavorites = async ( req = request, res = response ) => { 
+    try {
+        const { user } = req;
+        const profile = await Profile.findOne({ user: user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo obtener los anuncios favoritos.' });
+        }
+        const favorites = profile.favorites;
+        const query = {
+            state: true,
+            visible: true,
+            id: {
+                $in: favorites
+            }
+        }
+        const options = {
+            page: pageValue,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category score publisher',
+            sort,
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query,options);
+        res.status(200).json({
+            favorites: ads.docs,
+            totalRows: ads.docs.length
+        });
+    } catch (error) {
+        console.log(' CONTROLLER GET FAVORITES -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const deleteFavorite = async ( req = request, res = response ) => {
+    try {
+        const { user } = req;
+        const { ad } = req.body;
+        const profile = await Profile.findOne({ user: user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo eliminar el anuncio de favoritos.' });
+        }
+        const index = profile.favorites.indexOf(ad);
+        if ( index > -1 ) {
+            profile.favorites.splice(index,1);
+        }
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            favorites: profile.favorites
+        });
+        if ( !profileUpdated ) {
+            return res.status(404).json({ msg : 'No se pudo eliminar el anuncio de favoritos.' });
+        }
+        res.status(200).json({
+            msg: 'Anuncio eliminado de favoritos'
+        });
+    } catch (error) {
+        console.log(' CONTROLLER DELETE FAVORITE -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+
 module.exports = {
     getProfile,
     updateProfile,
@@ -136,5 +224,8 @@ module.exports = {
     addAdHistorial,
     getHistorial,
     sendNotifications,
-    disabledNotifications
+    manageNotifications,
+    saveAdFavorite,
+    getFavorites,
+    deleteFavorite
 }
