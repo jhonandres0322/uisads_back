@@ -8,7 +8,8 @@ const {
     registerUser,
     changePassword,
     forgotPassword,
-    validateCodeOTP
+    validateCodeOTP,
+    loginGoogleAuth
 } = require('../controllers/auth_controller');
 
 // * Importación de los middlewares
@@ -59,6 +60,10 @@ router.post('/forget-password',
 // * Ruta para verificar el otp enviado
 router.post('/verify-otp', 
     validateCodeOTP
+);
+// *Ruta para verificar el usuario que loguea
+router.post('/google',  
+    loginGoogleAuth
 );
 
 module.exports = router;

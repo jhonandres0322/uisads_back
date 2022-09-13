@@ -4,6 +4,8 @@ const { request, response } = require('express');
 // * Importación de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
 const { validatePassword, createPassword } = require('../helpers/user_helper');
+const { createProfile } = require('../helpers/profile_helper');
+const { validarGoogleIdToken } = require('../helpers/google_verify_token');
 
 // * Importación de modelos
 const User = require('../models/user_model');
@@ -12,7 +14,6 @@ const Profile = require('../models/profile_model');
 // * Importación de servicios
 const { generateOTP } = require('../services/otp_service');
 const { sendEmail } = require('../services/mail_service');
-const { createProfile } = require('../helpers/profile_helper');
 
 
 // * Controlador para iniciar sesión en el servidor
@@ -162,18 +163,52 @@ const validateCodeOTP = async ( req = request, res = response ) => {
         return res.status(500).json({ msg : 'Problemas para validar el codigo' });
     }
 }
-
-const loginGoogleFacebook = async ( req = request, res = response ) => {
+// * Controlador para validar authenticacion con Google
+const loginGoogleAuth = async ( req = request, res = response ) => {
+    
     try {
-        
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ 
+                ok: false,
+                msg: 'No se recibio el token en la peticion' 
+            });
+        }
+        // Verificacion Token de Google
+        const googleUser = await validarGoogleIdToken( token );
+        // Se verifica si es diferente de nulo para revisar el procesamiento del token si fue o no valido
+        if (!googleUser) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Token de google no valido'
+            });
+        }
+        // Se verifica si el usuario existe en la base de datos para el inicio de sesion
+        console.log(googleUser.email);
+        // const user = await User.findOne({ email: googleUser.email });
+        res.json({
+            msg: 'Google Auth',
+            googleUser,
+            ok: true
+        });
     } catch (error) {
-        console.log(' CONTROLLER LOGIN GOOGLE FACEBOOK -->', error );
         return res.status(500).json({
             msg: 'No se pudo ingresar al aplicativo'
         });
     }
 }
 
+// * Controlador para validar authenticacion con Facebook
+const loginFacebook = async ( req = request, res = response ) => {
+    try {
+        
+    } catch (error) {
+        console.log(' CONTROLLER LOGIN  FACEBOOK -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
 const loginGuest = async ( req = request, res = response ) => {
     try {
         
@@ -191,7 +226,8 @@ module.exports = {
     changePassword,
     forgotPassword,
     validateCodeOTP,
-    loginGoogleFacebook,
+    loginGoogleAuth,
+    loginFacebook,
     loginGuest
 }
 
