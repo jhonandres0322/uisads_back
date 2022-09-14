@@ -5,6 +5,9 @@ const { request, response } = require("express");
 const Profile = require('../models/profile_model');
 const Ad = require('../models/ad_model');
 const User = require('../models/user_model');
+const View = require('../models/view_model');
+
+// * Función para buscar el perfil del usuario
 const { searchProfile } = require('../helpers/profile_helper');
 
 // * Controlador para ver el perfil
@@ -87,7 +90,31 @@ const calculateRatingProfile = async ( req = request, res = response ) => {
 
 const addAdHistorial = async ( req = request, res = response ) => {
     try {
-        
+        const { ad } = req.body;
+        const { user } = req;
+        const profile = await Profile.findOne({ user : user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
+        }
+        const viewNew = new View({
+            ad,
+            visiter: profile._id
+        });
+        const viewSaved = await viewNew.save();
+        if ( !viewSaved ) {
+            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
+        }
+        const historial = profile.historial;
+        historial.push(ad);
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            historial
+        });
+        if ( !profileUpdated ) {
+            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
+        }
+        res.status(200).json({
+            msg: 'Operación exitosa'
+        });
     } catch (error) {
         console.log(' CONTROLLER ADD AD HISTORIAL -->', error );
         return res.status(500).json({
@@ -98,6 +125,36 @@ const addAdHistorial = async ( req = request, res = response ) => {
 
 const getHistorial = async ( req = request, res = response ) => {
     try {
+        const { user } = req;
+        const profile = await Profile.findOne({ user : user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo mostrar el historial.' });
+        }
+        const historial = await View.find({ visiter: profile._id }).populate('ad');
+        console.log('HISTORIAL -->', historial);
+        const query = {
+            state: true,
+            visible: true,
+            id: {
+                $in: historial
+            }
+        }
+        const options = {
+            page,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category score publisher',
+            sort,
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query,options);
+        res.status(200).json({
+            historial: ads.docs,
+            totalRows: ads.docs.length
+        });
+        res.status(200).json({
+            msg: 'Notificación enviada con exito'
+        });
+        
         
     } catch (error) {
         console.log(' CONTROLLER GET HISTORIAL -->', error );
@@ -107,9 +164,63 @@ const getHistorial = async ( req = request, res = response ) => {
     }
 }
 
+const removeHistorialTotal = async ( req = request, res = response ) => {
+    try {
+        const { user } = req;
+        const profile = await Profile.findOne({ user : user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo mostrar el historial.' });
+        }
+        const historial = [];
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            historial
+        });
+        if ( !profileUpdated ) {
+            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
+        }
+        res.status(200).json({
+            msg: 'Historial eliminado con exito'
+        });
+    } catch (error) {
+        console.log(' CONTROLLER REMOVE HISTORIAL TOTAL -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+
 const sendNotifications = async ( req = request, res = response ) => {
     try {
-        
+        const { user } = req;
+        const profile = await Profile.findOne({ user : user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo enviar la notificación.' });
+        }
+        const notifications = profile.notifications;
+        const query = {
+            state: true,
+            visible: true,
+            id: {
+                $in: notifications
+            }
+        }
+        const options = {
+            page,
+            limit: process.env.PAGE_SIZE,
+            select: 'title main_page createdAt category score publisher',
+            sort,
+            populate: 'main_page'
+        };
+        const ads = await Ad.paginate(query,options);
+        res.status(200).json({
+            notifications: ads.docs,
+            totalRows: ads.docs.length
+        });
+        res.status(200).json({
+            msg: 'Notificación enviada con exito'
+        });
+    
     } catch (error) {
         console.log(' CONTROLLER SEND NOTIFICATIONS -->', error );
         return res.status(500).json({
@@ -223,6 +334,7 @@ module.exports = {
     calculateRatingProfile,
     addAdHistorial,
     getHistorial,
+    removeHistorialTotal,
     sendNotifications,
     manageNotifications,
     saveAdFavorite,
