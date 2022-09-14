@@ -158,6 +158,12 @@ const validateCodeOTP = async ( req = request, res = response ) => {
         if ( !user ) {
             return res.status(400).json({ msg : 'Codigo Invalido' });
         }
+        const userUpdated = await User.findByIdAndUpdate( user._id, {
+            otp: null
+        });
+        if ( !userUpdated ) {
+            return res.status(400).json({ msg : 'Problemas para validar el codigo' });
+        }
         res.status(200).json({ msg: 'Codigo valido' });
     } catch (error) {
         return res.status(500).json({ msg : 'Problemas para validar el codigo' });
