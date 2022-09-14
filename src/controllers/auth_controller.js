@@ -3,7 +3,7 @@ const { request, response } = require('express');
 
 // * Importación de helpers
 const { generarJWT } = require('../helpers/generate_jwt');
-const { validatePassword, createPassword } = require('../helpers/user_helper');
+const { validatePassword, createPassword, verifyUser } = require('../helpers/user_helper');
 const { createProfile } = require('../helpers/profile_helper');
 const { validarGoogleIdToken } = require('../helpers/google_verify_token');
 
@@ -184,12 +184,34 @@ const loginGoogleAuth = async ( req = request, res = response ) => {
             });
         }
         // Se verifica si el usuario existe en la base de datos para el inicio de sesion
-        console.log(googleUser.email);
-        // const user = await User.findOne({ email: googleUser.email });
+        const user = await User.findOne({ email: googleUser.email });
+        // Si el usuario existe se procede a generar el token de autenticacion
+        if ( !user ) {
+            return res.status(401).json({ 
+                error: true, 
+                msg : `No existe una cuenta con el correo ${googleUser.email}`
+            });
+        }
+        // Verificar si el usuario se encuentra bloqueado
+        if ( user.blocked ||  !user.state ) {
+            return res.status(404).json({ msg :  'El usuario se encuentra bloqueado, Contacte al administrador' });
+        }
+        const tokenJWT = await generarJWT( user._id );
+        const lastEntry = new Date();
+        await User.findByIdAndUpdate( user._id, {
+            lastEntry,
+            available: true,
+            retry: 0,
+            blocked : false
+        });
+        const profile = await Profile.findOne({user: user._id}).populate('image');
         res.json({
-            msg: 'Google Auth',
-            googleUser,
-            ok: true
+            msg: 'Inicio de sesión correcto por medio de Google',
+            user,
+            token: tokenJWT,
+            profile,
+            email: user.email,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({
