@@ -2,14 +2,22 @@ const Report = require('../models/report_model');
 const { searchProfile } = require('../helpers/profile_helper');
 const { request, response } = require('express');
 
-const createReport = async ( req = request, res = response ) => {
+const manageReport = async ( req = request, res = response ) => {
     try {
         const { ad } = req.body;
         const { user } = req;
         const profile = searchProfile( user._id );
         const reportExists = await Report.findOne({ reporter: profile._id, ad });
         if( reportExists ) {
-            return res.status(400).json({ msg : 'Ya ha reportado este anuncio!' });
+            const reportDeleted = await Report.findByIdAndDelete( reportExists._id );
+            if( !reportDeleted ) {
+                return res.status(400).json({
+                    msg: 'No se pudo eliminar el reporte'
+                });
+            }
+            return res.status(200).json({
+                msg: 'El reporte se ha eliminado correctamente',
+            })
         }
         const reportNew = new Report({
             reporter: profile._id,
@@ -20,7 +28,7 @@ const createReport = async ( req = request, res = response ) => {
             return res.status(400).json({ msg : 'No se pudo guardar el reporte' });
         }
         return res.status(200).json({
-            msg: 'Se creo el reporte con exito'
+            msg: 'El reporte se ha creado correctamente',
         });
     } catch (error) {
         return res.status(404).json({ msg : `No se pueden visualizar los anuncios ${error}` });
@@ -28,5 +36,5 @@ const createReport = async ( req = request, res = response ) => {
 }
 
 module.exports = {
-    createReport
+    manageReport
 }
