@@ -11,7 +11,7 @@ const schemaView = new Schema({
     },
     view_date: {
         type: Date,
-        default: new Date.now()
+        default: Date.now()
     }
 });
 
