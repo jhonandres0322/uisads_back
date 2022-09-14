@@ -13,7 +13,6 @@ const {
     getAds,
     searchAds,
     getAdsByCategory,
-    saveFavorite
 } = require("../controllers/ad_controller");
 
 // * Importacion de middlewares

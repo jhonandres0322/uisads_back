@@ -276,29 +276,33 @@ const saveAdFavorite = async ( req = request, res = response ) => {
 const getFavorites = async ( req = request, res = response ) => { 
     try {
         const { user } = req;
+        const { page } = req.params;
         const profile = await Profile.findOne({ user: user._id });
         if ( !profile ) {
             return res.status(404).json({ msg : 'No se pudo obtener los anuncios favoritos.' });
         }
         const favorites = profile.favorites;
+        console.log('FAVORITES -->', favorites);
         const query = {
             state: true,
             visible: true,
-            id: {
+            _id: {
                 $in: favorites
             }
         }
         const options = {
-            page: pageValue,
+            page,
             limit: process.env.PAGE_SIZE,
             select: 'title main_page createdAt category score publisher',
-            sort,
+            sort: {
+                createdAt: -1
+            },
             populate: 'main_page'
         };
         const ads = await Ad.paginate(query,options);
         res.status(200).json({
-            favorites: ads.docs,
-            totalRows: ads.docs.length
+            totalRows: ads.docs.length,
+            favorites: ads.docs
         });
     } catch (error) {
         console.log(' CONTROLLER GET FAVORITES -->', error );
