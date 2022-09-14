@@ -231,7 +231,17 @@ const sendNotifications = async ( req = request, res = response ) => {
 
 const manageNotifications = async ( req = request, res = response ) => {
     try {
-        
+        const { choice } = req.body;
+        const { user } = req;
+        const profileUpdated = await Profile.findOneAndUpdate( { user : user._id } ,{
+            isNotify: choice == 'active' ? true : false 
+        });
+        if ( !profileUpdated ) {
+            return res.status(404).json({ msg : 'No se pudo actualizar la configuración de notificaciones.' });
+        }
+        res.status(200).json({
+            msg: 'Configuración de notificaciones actualizada con exito'
+        });
     } catch (error) {
         console.log(' CONTROLLER DISABLED NOTIFICATIONS -->', error );
         return res.status(500).json({

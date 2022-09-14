@@ -9,7 +9,9 @@ const {
     calculateRatingProfile,
     saveAdFavorite,
     getFavorites,
-    deleteFavorite
+    deleteFavorite,
+    manageNotifications,
+    sendNotifications
 } = require("../controllers/profile_controller");
 
 // * Llamado de los middlewares
@@ -71,5 +73,16 @@ router.delete('/favorite-ad/:id',
     deleteFavorite
 );
 
+router.post('/notifications',
+    validateJWT,
+    validateFields,
+    manageNotifications
+);
+
+router.get('/notifications/:page',
+    validateJWT,
+    validateFields,
+    sendNotifications
+);
 
 module.exports = router;
