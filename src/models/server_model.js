@@ -13,6 +13,9 @@ const uploadRoutes = require('../routes/upload_route');
 const cityRoutes = require('../routes/city_route');
 const reportRoutes = require('../routes/report_route');
 const interestRoutes = require('../routes/interest_route');
+const favoriteRoutes = require('../routes/favorite_route');
+const historialRoutes = require('../routes/historial_route');
+const notificationRoutes = require('../routes/notification_route');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -33,6 +36,9 @@ class Server{
         this.cityPath = '/api/city';
         this.reportPath = '/api/report';
         this.interestPath = '/api/interest';
+        this.favoritePath = '/api/favorite';
+        this.historialPath = '/api/historial';
+        this.notificationPath = '/api/notification';
         // Connection Database
         this.connectDatabase();
         // Middlewares
@@ -65,6 +71,9 @@ class Server{
         this.app.use(this.reportPath, reportRoutes);
         this.app.use(this.cityPath, cityRoutes);
         this.app.use(this.interestPath, interestRoutes);
+        this.app.use(this.notificationPath, notificationRoutes);
+        this.app.use(this.favoritePath, favoriteRoutes);
+        this.app.use(this.historialPath, historialRoutes);
     }
 
     // * Activación del servidor

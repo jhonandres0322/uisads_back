@@ -7,13 +7,14 @@ const {
 
 const { validateJWT } = require('../middlewares/validate_jwt');
 const { validateFields } = require("../middlewares/validate_fields");
-const { isProfileExists } = require("../middlewares/validate_user");
+const { validateAdExists } = require('../middlewares/validate_ad');
+
 
 const router = Router();
 
-router.post('/manage',
+router.post('/',
     validateJWT,
-    isProfileExists,
+    check('ad').custom( validateAdExists ),
     check('ad','La publicación debe ser obligatoria').not().isEmpty(),
     check('ad').isMongoId(),
     validateFields,
