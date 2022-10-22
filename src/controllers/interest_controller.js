@@ -3,15 +3,17 @@ const Profile = require('../models/profile_model');
 
 const createInterest = async ( req = request, res = response ) => {
     try {
-        const { interests } = req.body;
+        let { interests}= req.body;
         const { user } = req;
+        interests = (typeof interests === 'string') ? JSON.parse(interests) : interests;
         console.log('INTERESTS -->', interests);
         const profileUpdated = await Profile.findOneAndUpdate(
             { user: user._id }, { interests }
         );
         if( !profileUpdated ){
             return res.status(400).json({
-                msg: 'No se pudo actualizar el perfil'
+                msg: 'No se pudo actualizar el perfil',
+                error: true
             });
         }
         return res.status(200).json({
@@ -20,7 +22,8 @@ const createInterest = async ( req = request, res = response ) => {
     } catch (error) {
         console.log(' CONTROLLER CREATE INTEREST  -->', error );
         return res.status(500).json({
-            msg: 'No se pudo ingresar al aplicativo'
+            msg: 'No se pudo ingresar al aplicativo',
+            error: true
         });
     }
 }
