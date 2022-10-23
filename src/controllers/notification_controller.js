@@ -48,15 +48,17 @@ const manageNotifications = async ( req = request, res = response ) => {
             isNotify: choice == 'active' ? true : false 
         });
         if ( !profileUpdated ) {
-            return res.status(404).json({ msg : 'No se pudo actualizar la configuración de notificaciones.' });
+            return res.status(404).json({ msg : 'No se pudo actualizar la configuración de notificaciones.', error: true });
         }
         res.status(200).json({
-            msg: 'Configuración de notificaciones actualizada con exito'
+            msg: 'Configuración de notificaciones actualizada con exito',
+            error: false
         });
     } catch (error) {
         console.log(' CONTROLLER DISABLED NOTIFICATIONS -->', error );
         return res.status(500).json({
-            msg: 'No se pudo ingresar al aplicativo'
+            msg: 'No se pudo ingresar al aplicativo',
+            error: true
         });
     }
 }
