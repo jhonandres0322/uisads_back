@@ -22,7 +22,8 @@ const schemaUser = new Schema({
     lastEntry: Date,
     available: Boolean,
     otp: String,
-}, {
+    typeRegister: String
+},{
     timestamps: true
 })
 

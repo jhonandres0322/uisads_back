@@ -1,23 +1,7 @@
 // * Importación del modelo
 const Ad = require('../models/ad_model');
-const mongoose = require('mongoose');
-
-
-// * Función para generar la paginación en los anuncios
-// * Tambien sirve para filtrar los anuncios y buscar por cierta condición
-const makePagination = async ( page = { }, sort = {}, condition = { }, filter = { } ) => {
-    const ads = await Ad.find({
-        [condition.key]: condition.value,
-        state: true,
-        [filter.key]: new RegExp(filter.value, 'i')
-    })
-    .populate('publisher')
-    .populate('category')
-    .sort({ [ sort.value ] : sort.direction })
-    .skip(( page.number - 1 ) * page.size )
-    .limit( page.size );
-    return ads;
-}
+const Profile = require('../models/profile_model');
+const View = require('../models/view_model');
 
 const updatePointsAd = async (choice, ad, type) => {
 
@@ -71,8 +55,45 @@ const createDateFilter = ( typeDate ) => {
     return date;
 }
 
+const showFavoriteAd = async ( ad, user ) => {
+    try {
+        const profile = await  Profile.findOne({ user });
+        if ( !profile ) return false;
+        const favorites = profile.favorites;
+        const isAdFavorite = favorites.find( favorite => JSON.stringify(favorite) == JSON.stringify(ad) );
+        return isAdFavorite ? true : false;
+    } catch (error) {
+        return false;
+    }
+}
+
+const addAdHistorial = async ( ad, user ) => {
+    try {
+        const profile = await Profile.findOne( {
+            user: user._id
+        })
+        if ( !profile ) return false;
+        const newView = new View({
+            ad,
+            visiter: profile._id
+        });
+        const viewSaved = await newView.save();
+        if ( !viewSaved ) return false;
+        const historial = profile.historial;
+        historial.push(ad);
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            historial
+        });
+        if ( !profileUpdated ) return false;
+        return true;
+    } catch (error) {
+        return "";
+    }
+}
+
 module.exports = {
-    makePagination,
     updatePointsAd,
-    createDateFilter
+    createDateFilter,
+    showFavoriteAd,
+    addAdHistorial
 }

@@ -23,6 +23,19 @@ const schemaProfile = new Schema({
     city : {
         type: Schema.Types.ObjectId,
         ref: 'City'
+    },
+    interests : [String],
+    notifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Ad'
+    }],
+    favorites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Ad'
+    }],
+    isNotify: {
+        type: Boolean,
+        default: false
     }
 },{
     timestamps: true

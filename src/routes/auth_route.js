@@ -1,14 +1,15 @@
 // * Importación de las dependencias
 const { Router } = require("express");
 const { check } = require('express-validator');
-
 // * Importación de los controladores
 const {
     login,
     registerUser,
     changePassword,
     forgotPassword,
-    validateCodeOTP
+    validateCodeOTP,
+    loginGoogleAuth,
+    loginFacebookAuth
 } = require('../controllers/auth_controller');
 
 // * Importación de los middlewares
@@ -59,6 +60,15 @@ router.post('/forget-password',
 // * Ruta para verificar el otp enviado
 router.post('/verify-otp', 
     validateCodeOTP
+);
+// *Ruta para verificar el usuario que loguea
+router.post('/google',  
+    loginGoogleAuth
+);
+
+// *Ruta para verificar el usuario que loguea
+router.post('/facebook/token',
+    loginFacebookAuth
 );
 
 module.exports = router;

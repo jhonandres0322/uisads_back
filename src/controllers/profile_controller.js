@@ -5,6 +5,9 @@ const { request, response } = require("express");
 const Profile = require('../models/profile_model');
 const Ad = require('../models/ad_model');
 const User = require('../models/user_model');
+const View = require('../models/view_model');
+
+// * Función para buscar el perfil del usuario
 const { searchProfile } = require('../helpers/profile_helper');
 
 // * Controlador para ver el perfil

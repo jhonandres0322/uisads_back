@@ -6,14 +6,20 @@ const { check, body } = require('express-validator');
 const { 
     getProfile, 
     updateProfile, 
-    calculateRatingProfile 
+    calculateRatingProfile,
+    saveAdFavorite,
+    getFavorites,
+    deleteFavorite,
+    manageNotifications,
+    sendNotifications
 } = require("../controllers/profile_controller");
 
 // * Llamado de los middlewares
 const { saveImageProfile } = require("../middlewares/upload_middleware");
 const { validateFields } = require("../middlewares/validate_fields");
 const { validateJWT } = require("../middlewares/validate_jwt");
-const { isProfileExists, validateExistsProfile } = require("../middlewares/validate_user");
+const { validateExistsProfile } = require("../middlewares/validate_user");
+
 
 const router = Router();
 

@@ -11,6 +11,11 @@ const authRoutes = require('../routes/auth_route');
 const categoryRoutes = require('../routes/category_route');
 const uploadRoutes = require('../routes/upload_route');
 const cityRoutes = require('../routes/city_route');
+const reportRoutes = require('../routes/report_route');
+const interestRoutes = require('../routes/interest_route');
+const favoriteRoutes = require('../routes/favorite_route');
+const historialRoutes = require('../routes/historial_route');
+const notificationRoutes = require('../routes/notification_route');
 const errorHandler = require('../middlewares/error_handler');
 
 // * Llamado de la conexión a la base de datos
@@ -27,7 +32,13 @@ class Server{
         this.profilePath = '/api/profile';
         this.ratingPath = '/api/rating';
         this.uploadPath = '/api/upload';
+        this.reportPath = '/api/report';
         this.cityPath = '/api/city';
+        this.reportPath = '/api/report';
+        this.interestPath = '/api/interest';
+        this.favoritePath = '/api/favorite';
+        this.historialPath = '/api/historial';
+        this.notificationPath = '/api/notification';
         // Connection Database
         this.connectDatabase();
         // Middlewares
@@ -43,7 +54,7 @@ class Server{
     
     // * Middlewares del servidor
     middlewares(){
-        this.app.use( cors()) ;
+        this.app.use( cors());
         this.app.use( express.json({ limit: '50mb'}) );
         this.app.use( express.urlencoded({ extended: true, limit: '50mb' }) );
         this.app.use( morgan('dev') );
@@ -57,7 +68,12 @@ class Server{
         this.app.use(this.profilePath, profileRoutes);
         this.app.use(this.categoryPath, categoryRoutes);
         this.app.use(this.uploadPath, uploadRoutes);
+        this.app.use(this.reportPath, reportRoutes);
         this.app.use(this.cityPath, cityRoutes);
+        this.app.use(this.interestPath, interestRoutes);
+        this.app.use(this.notificationPath, notificationRoutes);
+        this.app.use(this.favoritePath, favoriteRoutes);
+        this.app.use(this.historialPath, historialRoutes);
     }
 
     // * Activación del servidor

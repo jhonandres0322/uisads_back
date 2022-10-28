@@ -12,7 +12,7 @@ const {
     getAdsByPublisher,
     getAds,
     searchAds,
-    getAdsByCategory
+    getAdsByCategory,
 } = require("../controllers/ad_controller");
 
 // * Importacion de middlewares

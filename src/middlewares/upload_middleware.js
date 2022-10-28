@@ -11,9 +11,8 @@ const { off } = require('../models/upload_model');
 
 // * Middleware para guardar las imagenes en la base de datos
 const saveImages = async (req = request, res = response, next) => {
-    const body =  req.body
-    const images = JSON.parse( body.images );
     try {
+        const images = JSON.parse( req.body.images );
         if ( images && images.length > 0 ) {
             let idsUploads = [];
             for ( let i = 0; i < images.length; i++ ) {
@@ -30,8 +29,8 @@ const saveImages = async (req = request, res = response, next) => {
             });
         }
     } catch (error) {
-        return res.status(401).json({
-            msg: `No existe imagenes para el anuncio`
+        return res.status(500).json({
+            msg: `No existe imagenes para el anuncio ${error}`
         });
     }
 }
