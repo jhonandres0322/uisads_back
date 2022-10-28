@@ -7,9 +7,9 @@ const createInterest = async ( req = request, res = response ) => {
         let { interests}= req.body;
         const { user } = req;
         interests = (typeof interests === 'string') ? JSON.parse(interests) : interests;
-        console.log('INTERESTS -->', interests);
+        // console.log('INTERESTS -->', interests);
         const notifications = await createNotifications(interests);
-        console.log('notifications -->', notifications);
+        // console.log('notifications -->', notifications);
         const profileUpdated = await Profile.findOneAndUpdate(
             { user: user._id }, { interests, notifications }
         );

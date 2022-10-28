@@ -10,7 +10,6 @@ const createNotifications = async ( interests = [] ) => {
         createdAt: { $gte: valueTime }
     })
     .sort({ createdAt: -1 });
-    console.log('ads -->', ads);
     if ( ads.length > 0 ) { 
         ads.forEach( ad => {
             interests.find( interest => {
