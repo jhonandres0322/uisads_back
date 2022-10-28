@@ -35,6 +35,7 @@ const validateNotifcations = async ( req = request, res = response ) => {
 const getNotifications = async ( req = request, res = response ) => {
     try {
         const { user } = req;
+        const { page } = req.params;
         const profile = await Profile.findOne({ user : user._id });
         if ( !profile ) {
             return res.status(404).json({ msg : 'No se pudo enviar la notificación.' });
@@ -43,7 +44,7 @@ const getNotifications = async ( req = request, res = response ) => {
         const query = {
             state: true,
             visible: true,
-            id: {
+            _id: {
                 $in: notifications
             }
         }
@@ -51,16 +52,15 @@ const getNotifications = async ( req = request, res = response ) => {
             page,
             limit: process.env.PAGE_SIZE,
             select: 'title main_page createdAt category score publisher',
-            sort,
+            sort: {
+                createdAt: -1
+            },
             populate: 'main_page'
         };
         const ads = await Ad.paginate(query,options);
         res.status(200).json({
             notifications: ads.docs,
             totalRows: ads.docs.length
-        });
-        res.status(200).json({
-            msg: 'Notificación enviada con exito'
         });
     
     } catch (error) {

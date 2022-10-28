@@ -10,7 +10,7 @@ const createInterest = async ( req = request, res = response ) => {
         const notifications = await createNotifications(interests);
         console.log('notifications -->', notifications);
         const profileUpdated = await Profile.findOneAndUpdate(
-            { user: user._id }, { interests }, { notifications }
+            { user: user._id }, { interests, notifications }
         );
         if( !profileUpdated ){
             return res.status(400).json({

@@ -3,12 +3,14 @@ const { createDateFilter } = require('../helpers/ad_helper');
 
 const createNotifications = async ( interests = [] ) => {
     console.time("createNotifications");
+    if( interest.length === 0 ) return [];
     const notifications = [];
-    const valueTime = createDateFilter('1m');
+    const valueTime = createDateFilter('3m');
     const ads = await Ad.find({
         createdAt: { $gte: valueTime }
     })
     .sort({ createdAt: -1 });
+    console.log('ads -->', ads);
     if ( ads.length > 0 ) { 
         ads.forEach( ad => {
             interests.find( interest => {

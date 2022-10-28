@@ -48,6 +48,9 @@ const createDateFilter = ( typeDate ) => {
         case '1m':
             dateMiliseconds = dateNow - ( 30 * 24 * 60 * 60 * 1000 );
             break;
+        case '3m':
+            dateMiliseconds = dateNow - ( 90 * 24 * 60 * 60 * 1000 );
+            break;
         default:
             break;
     }
