@@ -11,12 +11,15 @@ const getHistorial = async ( req = request, res = response ) => {
         if ( !profile ) {
             return res.status(404).json({ msg : 'No se pudo mostrar el historial.' });
         }
-        const historial = await View.find({ visiter: profile._id }).populate('ad');
+        const historial = await View.find({ visiter: profile._id });
+        const historialTotal = historial.map( view => {
+            return view.ad
+        });
         const query = {
             state: true,
             visible: true,
-            id: {
-                $in: historial
+            _id: {
+                $in: historialTotal
             }
         }
         const options = {
@@ -30,14 +33,9 @@ const getHistorial = async ( req = request, res = response ) => {
         };
         const ads = await Ad.paginate(query,options);
         res.status(200).json({
-            historial: ads.docs,
-            totalRows: ads.docs.length
+            totalRows: ads.docs.length,
+            historial: ads.docs
         });
-        res.status(200).json({
-            msg: 'Notificación enviada con exito'
-        });
-        
-        
     } catch (error) {
         console.log(' CONTROLLER GET HISTORIAL -->', error );
         return res.status(500).json({
@@ -72,7 +70,6 @@ const removeHistorialTotal = async ( req = request, res = response ) => {
 }
 
 module.exports = {
-    addAdHistorial,
     getHistorial,
     removeHistorialTotal
 }

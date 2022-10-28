@@ -4,7 +4,7 @@ const { request, response } = require('express');
 // * Importación de los helpers
 const { deleteUploads } = require('../helpers/upload_helper');
 const { searchProfile } = require('../helpers/profile_helper');
-const { updatePointsAd, createDateFilter, addAdHistorial } = require('../helpers/ad_helper');
+const { updatePointsAd, createDateFilter, addAdHistorial, showFavoriteAd } = require('../helpers/ad_helper');
 
 // * Importación de los modelos
 const Ad = require('../models/ad_model');
@@ -123,7 +123,7 @@ const getAd = async ( req = request, res = response ) => {
             showFavorite
         });
     } catch (error) {
-        return res.status(500).json({  msg :  'No se puede encontro el anuncio'  });
+        return res.status(500).json({  msg :  `No se puede encontro el anuncio ${error}`  });
     }
 }
 
