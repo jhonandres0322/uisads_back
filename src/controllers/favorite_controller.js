@@ -10,7 +10,7 @@ const saveAdFavorite = async ( req = request, res = response ) => {
         const profile = await Profile.findOne({ user: user._id });
         const index = profile.favorites.indexOf(ad);
         if ( index > -1 ) {
-            return res.status(400).json({ msg: 'El anuncio ya esta en favoritos' });
+            return res.status(400).json({ msg: 'El anuncio ya esta en favoritos', error: true });
         }
         profile.favorites.push(ad);
         const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{

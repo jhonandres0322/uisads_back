@@ -6,7 +6,7 @@ const validateNotifcations = async ( req = request, res = response ) => {
         const { user } = req;
         const profile = await Profile.findOne({ user : user._id });
         if ( !profile ) {
-            return res.status(404).json({ msg : 'No se pudo enviar la notificación.'});
+            return res.status(404).json({ msg : 'No se pudo enviar la notificación.', error: true });
         }
         const isNotify = profile.isNotify;
         if( !isNotify ) {
@@ -22,12 +22,13 @@ const validateNotifcations = async ( req = request, res = response ) => {
             });
         }
         return res.status(200).json({
-            msg : 'Tiene notificaciones nuevas',
+            msg : 'Tienes nuevos anuncios asociados a sus intereses, Navega ahora a notificaciones',
         });
     } catch (error) {
         console.log(' CONTROLLER VALIDATE NOTIFICATIONS  -->', error );
         return res.status(500).json({
-            msg: 'No se pudo ingresar al aplicativo'
+            msg: 'No se pudo ingresar al aplicativo',
+            error: true
         });
     }
 }

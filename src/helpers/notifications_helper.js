@@ -3,7 +3,7 @@ const { createDateFilter } = require('../helpers/ad_helper');
 
 const createNotifications = async ( interests = [] ) => {
     console.time("createNotifications");
-    if( interest.length === 0 ) return [];
+    if( interests.length === 0 ) return [];
     const notifications = [];
     const valueTime = createDateFilter('3m');
     const ads = await Ad.find({
