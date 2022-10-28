@@ -3,42 +3,6 @@ const Profile = require('../models/profile_model');
 const View = require('../models/view_model');
 const Ad = require('../models/ad_model');
 
-
-const addAdHistorial = async ( req = request, res = response ) => {
-    try {
-        const { ad } = req.body;
-        const { user } = req;
-        const profile = await Profile.findOne({ user : user._id });
-        if ( !profile ) {
-            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
-        }
-        const viewNew = new View({
-            ad,
-            visiter: profile._id
-        });
-        const viewSaved = await viewNew.save();
-        if ( !viewSaved ) {
-            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
-        }
-        const historial = profile.historial;
-        historial.push(ad);
-        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
-            historial
-        });
-        if ( !profileUpdated ) {
-            return res.status(404).json({ msg : 'No se pudo actualizar el historial.' });
-        }
-        res.status(200).json({
-            msg: 'Operación exitosa'
-        });
-    } catch (error) {
-        console.log(' CONTROLLER ADD AD HISTORIAL -->', error );
-        return res.status(500).json({
-            msg: 'No se pudo ingresar al aplicativo'
-        });
-    }
-}
-
 const getHistorial = async ( req = request, res = response ) => {
     try {
         const { user } = req;

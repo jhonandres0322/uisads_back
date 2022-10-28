@@ -4,7 +4,7 @@ const { request, response } = require('express');
 // * Importación de los helpers
 const { deleteUploads } = require('../helpers/upload_helper');
 const { searchProfile } = require('../helpers/profile_helper');
-const { updatePointsAd, createDateFilter } = require('../helpers/ad_helper');
+const { updatePointsAd, createDateFilter, addAdHistorial } = require('../helpers/ad_helper');
 
 // * Importación de los modelos
 const Ad = require('../models/ad_model');
@@ -108,13 +108,16 @@ const getAdsByPublisher = async ( req = request, res = response) => {
 const getAd = async ( req = request, res = response ) => {
     const { id } = req.params;
     const { user } = req;
-    // Añadir funcionalidad del addAdHistorial para no sobrecargar las peticiones
     try {
         const ad = await Ad.findById(id).populate('images').populate('main_page');
         if ( !ad ) {
             return res.status(400).json({  msg :  'No se encontró el anuncio' });
         }
         const showFavorite = await showFavoriteAd( ad._id, user._id );
+        const showView = addAdHistorial( ad._id, user._id );
+        if( !showView ) {
+            return res.status(500).json({ msg : 'No se pudo registrar la visita' });
+        }
         res.status(200).json({
             ad,
             showFavorite

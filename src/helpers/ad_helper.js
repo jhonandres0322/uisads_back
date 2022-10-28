@@ -1,6 +1,7 @@
 // * Importación del modelo
 const Ad = require('../models/ad_model');
 const Profile = require('../models/profile_model');
+const View = require('../models/view_model');
 
 const updatePointsAd = async (choice, ad, type) => {
 
@@ -66,8 +67,33 @@ const showFavoriteAd = async ( ad, user ) => {
     }
 }
 
+const addAdHistorial = async ( ad, user ) => {
+    try {
+        const profile = await Profile.findOne( {
+            user: user._id
+        })
+        if ( !profile ) return false;
+        const newView = new View({
+            ad,
+            visiter: profile._id
+        });
+        const viewSaved = await newView.save();
+        if ( !viewSaved ) return false;
+        const historial = profile.historial;
+        historial.push(ad);
+        const profileUpdated = await Profile.findByIdAndUpdate( profile._id ,{
+            historial
+        });
+        if ( !profileUpdated ) return false;
+        return true;
+    } catch (error) {
+        return "";
+    }
+}
+
 module.exports = {
     updatePointsAd,
     createDateFilter,
-    showFavoriteAd
+    showFavoriteAd,
+    addAdHistorial
 }
