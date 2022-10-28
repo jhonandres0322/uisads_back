@@ -1,14 +1,16 @@
 const { request, response } = require('express');
 const Profile = require('../models/profile_model');
+const { createNotifications } = require('../helpers/notifications_helper');
 
 const createInterest = async ( req = request, res = response ) => {
     try {
         let { interests}= req.body;
         const { user } = req;
         interests = (typeof interests === 'string') ? JSON.parse(interests) : interests;
-        console.log('INTERESTS -->', interests);
+        const notifications = await createNotifications(interests);
+        console.log('notifications -->', notifications);
         const profileUpdated = await Profile.findOneAndUpdate(
-            { user: user._id }, { interests }
+            { user: user._id }, { interests }, { notifications }
         );
         if( !profileUpdated ){
             return res.status(400).json({

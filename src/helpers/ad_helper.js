@@ -1,5 +1,6 @@
 // * Importación del modelo
 const Ad = require('../models/ad_model');
+const Profile = require('../models/profile_model');
 
 const updatePointsAd = async (choice, ad, type) => {
 
@@ -53,7 +54,20 @@ const createDateFilter = ( typeDate ) => {
     return date;
 }
 
+const showFavoriteAd = async ( ad, user ) => {
+    try {
+        const profile = await  Profile.findOne({ user });
+        if ( !profile ) return false;
+        const favorites = profile.favorites;
+        const isAdFavorite = favorites.find( favorite => JSON.stringify(favorite) == JSON.stringify(ad) );
+        return isAdFavorite ? true : false;
+    } catch (error) {
+        return false;
+    }
+}
+
 module.exports = {
     updatePointsAd,
-    createDateFilter
+    createDateFilter,
+    showFavoriteAd
 }

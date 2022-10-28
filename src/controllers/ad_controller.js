@@ -107,13 +107,17 @@ const getAdsByPublisher = async ( req = request, res = response) => {
 // * Controlador para mostrar un anuncio
 const getAd = async ( req = request, res = response ) => {
     const { id } = req.params;
+    const { user } = req;
+    // Añadir funcionalidad del addAdHistorial para no sobrecargar las peticiones
     try {
         const ad = await Ad.findById(id).populate('images').populate('main_page');
         if ( !ad ) {
             return res.status(400).json({  msg :  'No se encontró el anuncio' });
         }
+        const showFavorite = await showFavoriteAd( ad._id, user._id );
         res.status(200).json({
-            ad
+            ad,
+            showFavorite
         });
     } catch (error) {
         return res.status(500).json({  msg :  'No se puede encontro el anuncio'  });

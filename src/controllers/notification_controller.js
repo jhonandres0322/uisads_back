@@ -1,7 +1,38 @@
 const Profile = require('../models/profile_model');
 const Ad = require('../models/ad_model');
 
-const sendNotifications = async ( req = request, res = response ) => {
+const validateNotifcations = async ( req = request, res = response ) => {
+    try {
+        const { user } = req;
+        const profile = await Profile.findOne({ user : user._id });
+        if ( !profile ) {
+            return res.status(404).json({ msg : 'No se pudo enviar la notificación.'});
+        }
+        const isNotify = profile.isNotify;
+        if( !isNotify ) {
+            return res.status(200).json({
+                msg : 'Las notificaciones se encuentran desactivadas',
+            });
+        }
+        
+        const notifications = profile.notifications;
+        if( notifications.length == 0 ) {
+            return res.status(200).json({
+                msg : 'No tiene notificaciones nuevas',
+            });
+        }
+        return res.status(200).json({
+            msg : 'Tiene notificaciones nuevas',
+        });
+    } catch (error) {
+        console.log(' CONTROLLER VALIDATE NOTIFICATIONS  -->', error );
+        return res.status(500).json({
+            msg: 'No se pudo ingresar al aplicativo'
+        });
+    }
+}
+
+const getNotifications = async ( req = request, res = response ) => {
     try {
         const { user } = req;
         const profile = await Profile.findOne({ user : user._id });
@@ -64,6 +95,7 @@ const manageNotifications = async ( req = request, res = response ) => {
 }
 
 module.exports = {
-    sendNotifications,
-    manageNotifications
+    getNotifications,
+    manageNotifications,
+    validateNotifcations
 }
